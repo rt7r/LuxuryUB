@@ -255,29 +255,29 @@ async def verifyLoggerGroup():
                 + str(e)
             )
     else:
-        descript = "- عزيزي المستخدم هذه هي مجموعة الإشعارات يرجى عدم حذفها "
-        photobt = await luxur.upload_file(file="luxur/razan/resources/start/Jepthon.JPEG")
+        descript = "@ee2en - عزيزي المستخدم هذه هي مجموعة الإشعارات يرجى عدم حذفها "
+        photobt = await luxur.upload_file(file="luxur/razan/resources/start/Luxury.jpg")
         botlog_group_id = await luxury_is_best(luxur, "مجموعة الأشعارات")
         if botlog_group_id:
             addgvar("PRIVATE_GROUP_BOT_API_ID", botlog_group_id)
             print("᯽︙تم العثور على مجموعة المساعدة بالفعل وإضافتها إلى المتغيرات.")
         else:
             _, groupid = await create_supergroup(
-                "مجموعة الأشعارات", luxur, Config.TG_BOT_USERNAME, descript, photobt
+                "مجموعة اشعارات لوكــجوري", luxur, Config.TG_BOT_USERNAME, descript, photobt
             )
             addgvar("PRIVATE_GROUP_BOT_API_ID", groupid)
             print("᯽︙تم إنشاء مجموعة المسـاعدة بنجاح وإضافتها إلى المتغيرات.")
         flag = True
     if PM_LOGGER_GROUP_ID == -100:
-        descript = "᯽︙ وظيفة الكروب يحفظ رسائل الخاص إذا ما تريد الأمر احذف الكروب نهائي \n  "
-        photobt = await luxur.upload_file(file="luxur/razan/resources/start/Jepthon2.JPEG")
+        descript = "᯽︙ @ee2en وظيفة الكروب يحفظ رسائل الخاص إذا ما تريد الأمر احذف الكروب نهائي \n  "
+        photobt = await luxur.upload_file(file="luxur/razan/resources/start/Luxury2.jpg")
         pm_logger_group_id = await luxury_is_best(luxur, "مجموعة التخزين")
         if pm_logger_group_id:
             addgvar("PM_LOGGER_GROUP_ID", pm_logger_group_id)
             print("تـم العثور على مجموعة كروب التخزين بالفعل وإضافة الـفارات الـيها.")
         else:
             _, groupid = await create_supergroup(
-                "مجموعة التخزين", luxur, Config.TG_BOT_USERNAME, descript, photobt
+                "مجموعة التخزين لوكـجوري", luxur, Config.TG_BOT_USERNAME, descript, photobt
             )
             addgvar("PM_LOGGER_GROUP_ID", groupid)
             print("تـم عمـل كروب التخزين بنـجاح وإضافة الـفارات الـيه.")
