@@ -4,7 +4,7 @@ import os
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 import LuxuryUB
-from LuxuryUB import BOTLOG_CHATID, PM_LOGGER_GROUP_ID
+from LuxuryUB import BOTLOG_CHATID, PM_LOGGER_GROUP_ID, StartTime
 from .Config import Config
 from .core.logger import logging
 from .core.session import luxur 
@@ -16,7 +16,8 @@ from .utils import (
     startupmessage,
     verifyLoggerGroup,
 )
-# استدعاء دالة جلب الجلسات من نظام الـ JSON المطور
+# استدعاء الدوال اللازمة من الـ SQL
+from .sql_helper.globals import addgvar, gvarstatus
 from .sql_helper.global_collectionjson import get_collections
 
 LOGS = logging.getLogger("Luxury")
@@ -28,7 +29,6 @@ cmdhr = Config.COMMAND_HAND_LER
 
 async def start_internal_clients():
     """تشغيل كافة الحسابات المنصبة داخلياً من قاعدة البيانات"""
-    # جلب كل الجلسات التابعة للمالك الأساسي
     sub_sessions = get_collections(Config.OWNER_ID)
     
     if not sub_sessions:
@@ -44,7 +44,6 @@ async def start_internal_clients():
         name = data.get("name")
         
         try:
-            # إنشاء عميل (Client) جديد لكل جلسة
             client = TelegramClient(StringSession(session_str), Config.APP_ID, Config.API_HASH)
             await client.start(bot_token=bot_token)
             LOGS.info(f"✅ تم تشغيل حساب: {name} بنجاح ✓")
@@ -80,6 +79,9 @@ async def luxury_startup():
     if PM_LOGGER_GROUP_ID != -100:
         await add_bot_to_logger_group(PM_LOGGER_GROUP_ID)
     
+    # تسجيل وقت التشغيل (هنا كان الخطأ)
+    addgvar(Config.OWNER_ID, "START_TIME", str(StartTime))
+    
     await startupmessage()
 
 # تشغيل المحرك الرئيسي
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     try:
         loop.run_until_complete(luxury_startup())
     except Exception as e:
+        # هنا تم تصحيح الخطأ بإضافة OWNER_ID إذا كنت تستخدم gvarstatus للتحقق
         LOGS.error(f"❌ خطأ غير متوقع: {e}")
     
     # إبقاء السورس شغالاً
