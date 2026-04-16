@@ -7,7 +7,7 @@ from LuxuryUB import BOTLOG_CHATID, PM_LOGGER_GROUP_ID
 from .Config import Config
 from .core.logger import logging
 from .core.session import luxur 
-from .helpers.utils.startup import (
+from .utils.startup import (
     add_bot_to_logger_group,
     load_plugins,
     setup_bot,
