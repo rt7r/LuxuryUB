@@ -37,8 +37,8 @@ async def amireallyalive(event):
     reply_to_id = await reply_id(event)
     uptime = await get_readable_time((time.time() - StartTime))
     _, check_sgnirts = check_data_base_heal_th()
-    EMOJI = gvarstatus("ALIVE_EMOJI") or "  - "
-    CUSTOM_ALIVE_TEXT = gvarstatus("ALIVE_TEXT")
+    EMOJI = gvarstatus(Config.OWNER_ID, "ALIVE_EMOJI") or "  - "
+    CUSTOM_ALIVE_TEXT = gvarstatus(Config.OWNER_ID, "ALIVE_TEXT")
     CAT_IMG = "https://files.catbox.moe/k4fxu0.jpg"
     if CAT_IMG:
         CAT = [x for x in CAT_IMG.split()]

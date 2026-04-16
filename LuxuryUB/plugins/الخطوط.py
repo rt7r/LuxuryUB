@@ -9,63 +9,63 @@ from telethon import functions
 from telethon.errors.rpcerrorlist import MessageIdInvalidError
 @luxur.on(admin_cmd(pattern="(خط الغامق|خط غامق)"))
 async def btext(event):
-    isbold = gvarstatus("bold")
+    isbold = gvarstatus(Config.OWNER_ID, "bold")
     if not isbold:
-        addgvar ("bold", "on")
+        addgvar (Config.OWNER_ID, "bold", "on")
         await edit_delete(event, "**᯽︙ تم تفعيل خط الغامق بنجاح ✓**")
         return
 
     if isbold:
-        delgvar("bold")
+        delgvar(Config.OWNER_ID, "bold")
         await edit_delete(event, "**᯽︙ تم اطفاء خط الغامق بنجاح ✓ **")
         return
 
 @luxur.on(admin_cmd(pattern="(خط المشطوب|خط مشطوب)"))
 async def btext(event):
-    istshwesh = gvarstatus("tshwesh")
+    istshwesh = gvarstatus(Config.OWNER_ID, "tshwesh")
     if not istshwesh:
-        addgvar ("tshwesh", "on")
+        addgvar (Config.OWNER_ID, "tshwesh", "on")
         await edit_delete(event, "**᯽︙ تم تفعيل خط المشطوب بنجاح ✓**")
         return
 
     if istshwesh:
-        delgvar("tshwesh")
+        delgvar(Config.OWNER_ID, "tshwesh")
         await edit_delete(event, "**᯽︙ تم اطفاء خط المشطوب بنجاح ✓ **")
         return
 
 @luxur.on(admin_cmd(pattern="(خط رمز|خط الرمز)"))
 async def btext(event):
-    isramz = gvarstatus("ramz")
+    isramz = gvarstatus(Config.OWNER_ID, "ramz")
     if not isramz:
-        addgvar ("ramz", "on")
+        addgvar (Config.OWNER_ID, "ramz", "on")
         await edit_delete(event, "**᯽︙ تم تفعيل خط الرمز بنجاح ✓**")
         return
 
     if isramz:
-        delgvar("ramz")
+        delgvar(Config.OWNER_ID, "ramz")
         await edit_delete(event, "**᯽︙ تم اطفاء خط الرمز بنجاح ✓ **")
         return
 
 @luxur.on(admin_cmd(pattern="(خط لوكـجوري|خط لوكـجوري)"))
 async def Aljoker(event):
-    Aljoker = gvarstatus("joker")
+    Aljoker = gvarstatus(Config.OWNER_ID, "joker")
     if not Aljoker:
-        addgvar ("joker", "on")
+        addgvar (Config.OWNER_ID, "joker", "on")
         await edit_delete(event, "**᯽︙ تم تفعيل خط لوكـجوري بنجاح ✓**")
         return
 
     if Aljoker:
-        delgvar("joker")
+        delgvar(Config.OWNER_ID, "joker")
         await edit_delete(event, "**᯽︙ تم اطفاء خط لوكـجوري بنجاح ✓ **")
         return
 
 @luxur.on(events.NewMessage(outgoing=True))
 async def reda(event):
     if event.message.text and not event.message.media and event.message.text.count(".") != 1 and event.message.text.count("@") != 1 and event.message.text.count("/") != 1:
-        isbold = gvarstatus("bold")
-        isramz = gvarstatus("ramz")
-        istshwesh = gvarstatus("tshwesh")
-        Aljoker = gvarstatus("joker")
+        isbold = gvarstatus(Config.OWNER_ID, "bold")
+        isramz = gvarstatus(Config.OWNER_ID, "ramz")
+        istshwesh = gvarstatus(Config.OWNER_ID, "tshwesh")
+        Aljoker = gvarstatus(Config.OWNER_ID, "joker")
         if isbold:
             try:
                 await event.edit(f"**{event.message.text}**")

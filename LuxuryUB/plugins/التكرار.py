@@ -23,7 +23,7 @@ async def spam_function(event, LuxuryUB, luxur, sleeptimem, sleeptimet, DelaySpa
     if len(luxur) == 2:
         spam_message = str(luxur[1])
         for _ in range(counter):
-            if gvarstatus("spamwork") is None:
+            if gvarstatus(Config.OWNER_ID, "spamwork") is None:
                 return
             if event.reply_to_msg_id:
                 await LuxuryUB.reply(spam_message)
@@ -32,7 +32,7 @@ async def spam_function(event, LuxuryUB, luxur, sleeptimem, sleeptimet, DelaySpa
             await asyncio.sleep(sleeptimet)
     elif event.reply_to_msg_id and LuxuryUB.media:
         for _ in range(counter):
-            if gvarstatus("spamwork") is None:
+            if gvarstatus(Config.OWNER_ID, "spamwork") is None:
                 return
             LuxuryUB = await event.client.send_file(
                 event.chat_id, LuxuryUB, caption=LuxuryUB.text
@@ -72,7 +72,7 @@ async def spam_function(event, LuxuryUB, luxur, sleeptimem, sleeptimet, DelaySpa
     elif event.reply_to_msg_id and LuxuryUB.text:
         spam_message = LuxuryUB.text
         for _ in range(counter):
-            if gvarstatus("spamwork") is None:
+            if gvarstatus(Config.OWNER_ID, "spamwork") is None:
                 return
             await event.client.send_message(event.chat_id, spam_message)
             await asyncio.sleep(sleeptimet)
@@ -195,7 +195,7 @@ async def stickerpack_spam(event):
     )
     addgvar("spamwork", True)
     for m in reqd_sticker_set.documents:
-        if gvarstatus("spamwork") is None:
+        if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
         await event.client.send_file(event.chat_id, m)
         await asyncio.sleep(0.7)
@@ -222,7 +222,7 @@ async def tmeme(event):
     await event.delete()
     addgvar("spamwork", True)
     for letter in message:
-        if gvarstatus("spamwork") is None:
+        if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
         await event.respond(letter)
     if BOTLOG:
@@ -247,7 +247,7 @@ async def tmeme(event):
     await event.delete()
     addgvar("spamwork", True)
     for word in message:
-        if gvarstatus("spamwork") is None:
+        if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
         await event.respond(word)
     if BOTLOG:
@@ -267,7 +267,7 @@ async def tmeme(event):
 
 @luxur.ar_cmd(pattern="ايقاف التكرار ?(.*)")
 async def stopspamrz(event):
-    if gvarstatus("spamwork") is not None and gvarstatus("spamwork") == "true":
+    if gvarstatus(Config.OWNER_ID, "spamwork") is not None and gvarstatus(Config.OWNER_ID, "spamwork") == "true":
         delgvar("spamwork")
         return await edit_delete(event, "**⌔∮ تم بنجاح ايقاف التكرار **")
     return await edit_delete(event, "**⌔∮ عذرا لم يتم تفعيل التكرار بالاصل**")

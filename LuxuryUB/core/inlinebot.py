@@ -95,14 +95,14 @@ def paginate_help(
     category_pgno=0,
 ):  # sourcery no-metrics
     try:
-        number_of_rows = int(gvarstatus("NO_OF_ROWS_IN_HELP") or 5)
+        number_of_rows = int(gvarstatus(Config.OWNER_ID, "NO_OF_ROWS_IN_HELP") or 5)
     except (ValueError, TypeError):
         number_of_rows = 5
     try:
-        number_of_cols = int(gvarstatus("NO_OF_COLUMNS_IN_HELP") or 2)
+        number_of_cols = int(gvarstatus(Config.OWNER_ID, "NO_OF_COLUMNS_IN_HELP") or 2)
     except (ValueError, TypeError):
         number_of_cols = 2
-    HELP_EMOJI = gvarstatus("HELP_EMOJI") or " "
+    HELP_EMOJI = gvarstatus(Config.OWNER_ID, "HELP_EMOJI") or " "
     helpable_plugins = [p for p in loaded_plugins if not p.startswith("_")]
     helpable_plugins = sorted(helpable_plugins)
     if len(HELP_EMOJI) == 2:
@@ -229,8 +229,8 @@ async def inline_handler(event):  # sourcery no-metrics
                     Button.url(" LuxuryUB UsᴇʀBoᴛ", "https://t.me/ee2en[[]]"),
                 )
             ]
-            ALIVE_PIC = gvarstatus("ALIVE_PIC")
-            IALIVE_PIC = gvarstatus("IALIVE_PIC")
+            ALIVE_PIC = gvarstatus(Config.OWNER_ID, "ALIVE_PIC")
+            IALIVE_PIC = gvarstatus(Config.OWNER_ID, "IALIVE_PIC")
             if IALIVE_PIC:
                 ROZE = [x for x in IALIVE_PIC.split()]
                 PIC = list(ROZE)
@@ -525,14 +525,14 @@ async def inline_handler(event):  # sourcery no-metrics
             buttons = [
                 Button.inline(text="🪐 الخـيارات", data="show_pmpermit_options"),
             ]
-            PM_PIC = gvarstatus("pmpermit_pic")
+            PM_PIC = gvarstatus(Config.OWNER_ID, "pmpermit_pic")
             if PM_PIC:
                 ROZE = [x for x in PM_PIC.split()]
                 PIC = list(ROZE)
                 ROZE_IMG = random.choice(PIC)
             else:
                 ROZE_IMG = None
-            query = gvarstatus("pmpermit_text")
+            query = gvarstatus(Config.OWNER_ID, "pmpermit_text")
             if ROZE_IMG and ROZE_IMG.endswith((".jpg", ".jpeg", ".png")):
                 result = builder.photo(
                     ROZE_IMG,

@@ -33,16 +33,16 @@ async def dato(event):
 #By @lx5x5
 @luxur.on(admin_cmd(pattern="(الذاتية تشغيل|ذاتية تشغيل)"))
 async def reda(event):
-    if gvarstatus ("savepicforme"):
+    if gvarstatus (Config.OWNER_ID, "savepicforme"):
         return await edit_delete(event, "**᯽︙حفظ الذاتيات مفعل وليس بحاجة للتفعيل مجدداً **")
     else:
-        addgvar("savepicforme", "reda")
+        addgvar(Config.OWNER_ID, "savepicforme", "reda")
         await edit_delete(event, "**᯽︙تم تفعيل ميزة حفظ الذاتيات بنجاح ✓**")
 
 @luxur.on(admin_cmd(pattern="(الذاتية تعطيل|ذاتية تعطيل)"))
 async def Reda_Is_Here(event):
-    if gvarstatus ("savepicforme"):
-        delgvar("savepicforme")
+    if gvarstatus (Config.OWNER_ID, "savepicforme"):
+        delgvar(Config.OWNER_ID, "savepicforme")
         return await edit_delete(event, "**᯽︙تم تعطيل حفظت الذاتيات بنجاح ✓**")
     else:
         await edit_delete(event, "**᯽︙انت لم تفعل حفظ الذاتيات لتعطيلها!**")
@@ -66,7 +66,7 @@ async def Hussein(event, caption):
 
 @luxur.on(events.NewMessage(func=lambda e: e.is_private and joker_unread_media(e) and e.sender_id != bot.uid))
 async def Reda(event):
-    if gvarstatus("savepicforme"):
+    if gvarstatus(Config.OWNER_ID, "savepicforme"):
         caption = """**
            🕷  غير مبري الذمة اذا استعملته للأبتزاز  🕷
 🕷 تم حفظ الذاتية بنجاح ✓

@@ -202,14 +202,14 @@ async def del_welcome(event):
     "To turn off or turn on of deleting previous welcome message."
     input_str = event.pattern_match.group(1)
     if input_str == "on":
-        if gvarstatus("clean_welcome") is None:
+        if gvarstatus(Config.OWNER_ID, "clean_welcome") is None:
             return await edit_delete(event, "**تم تشغيل الترحيب بنجاح ✓ **")
         delgvar("clean_welcome")
         return await edit_delete(
             event,
             "__From now on previous welcome message will be deleted and new welcome message will be sent.__",
         )
-    if gvarstatus("clean_welcome") is None:
+    if gvarstatus(Config.OWNER_ID, "clean_welcome") is None:
         addgvar("clean_welcome", "false")
         return await edit_delete(
             event, "__From now on previous welcome message will not be deleted .__"

@@ -380,7 +380,7 @@ def is_flood(uid: int) -> Optional[bool]:
 @luxur.tgbot.on(CallbackQuery(data=re.compile(b"toggle_bot-antiflood_off$")))
 @check_owner
 async def settings_toggle(c_q: CallbackQuery):
-    if gvarstatus("bot_antif") is None:
+    if gvarstatus(Config.OWNER_ID, "bot_antif") is None:
         return await c_q.answer(f"بوت قفل التكرار بالفعل معطل.", alert=False)
     delgvar("bot_antif")
     await c_q.answer(f"Bot Antiflood disabled.", alert=False)
@@ -390,7 +390,7 @@ async def settings_toggle(c_q: CallbackQuery):
 @luxur.bot_cmd(incoming=True, func=lambda e: e.is_private)
 @luxur.bot_cmd(edited=True, func=lambda e: e.is_private)
 async def antif_on_msg(event):
-    if gvarstatus("bot_antif") is None:
+    if gvarstatus(Config.OWNER_ID, "bot_antif") is None:
         return
     chat = await event.get_chat()
     if chat.id == Config.OWNER_ID:

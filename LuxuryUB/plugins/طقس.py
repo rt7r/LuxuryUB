@@ -58,7 +58,7 @@ LuxuryUB = "36980ed85a0d7008872784656e7ff2c8"
 async def get_weather(event):  # sourcery no-metrics
     "لعرض معلومات الطقس."
     input_str = "".join(event.text.split(maxsplit=1)[1:])
-    CITY = gvarstatus("DEFCITY") or "Baghdad" if not input_str else input_str
+    CITY = gvarstatus(Config.OWNER_ID, "DEFCITY") or "Baghdad" if not input_str else input_str
     timezone_countries = {
         timezone: country
         for country, timezones in c_tz.items()

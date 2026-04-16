@@ -91,9 +91,9 @@ async def _(event):
 )
 async def _(event):
     "To reset your original details"
-    name = gvarstatus("fname")
-    blank = gvarstatus("lname")
-    bio = gvarstatus("oabout")
+    name = gvarstatus(Config.OWNER_ID, "fname")
+    blank = gvarstatus(Config.OWNER_ID, "lname")
+    bio = gvarstatus(Config.OWNER_ID, "oabout")
     await event.client(
         functions.photos.DeletePhotosRequest(
             await event.client.get_profile_photos("me", limit=1)
@@ -176,11 +176,11 @@ async def reda(event):
 @luxur.ar_cmd(pattern="اعادة_الدردشه")
 async def reda_back(event):
     if event.is_group or event.is_channel:
-        if gvarstatus (f"{event.chat_id}name"):
+        if gvarstatus (Config.OWNER_ID, f"{event.chat_id}name"):
             try:
                 await luxur(functions.channels.EditTitleRequest(
                     channel=await luxur.get_entity(event.chat_id),
-                    title=gvarstatus (f"{event.chat_id}name")
+                    title=gvarstatus (Config.OWNER_ID, f"{event.chat_id}name")
                 ))
             except ChatAdminRequiredError:
                 return await edit_delete(event, "**᯽︙ يجب ان تكون لديك صلاحيات لتغيير الاسم والصورة والبايو لإعادة القناة او الكروب**")
@@ -188,7 +188,7 @@ async def reda_back(event):
                 return await edit_delete(event, "**انتضر مدة لا تقل عن 5 دقائق لإعادة الدردشة مجدداً FLOODWAITERROR خطأ من التيليجرام**")
             await luxur(functions.messages.EditChatAboutRequest(
             peer=event.chat_id,
-            about=gvarstatus (f"{event.chat_id}about")
+            about=gvarstatus (Config.OWNER_ID, f"{event.chat_id}about")
             ))
             async for photo in luxur.iter_profile_photos(event.chat_id, limit=1) :
                     await luxur(

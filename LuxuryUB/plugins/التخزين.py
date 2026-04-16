@@ -29,7 +29,7 @@ LOG_CHATS_ = LOG_CHATS()
 async def monito_p_m_s(event):  # sourcery no-metrics
     if Config.PM_LOGGER_GROUP_ID == -100:
         return
-    if gvarstatus("PMLOG") and gvarstatus("PMLOG") == "false":
+    if gvarstatus(Config.OWNER_ID, "PMLOG") and gvarstatus(Config.OWNER_ID, "PMLOG") == "false":
         return
     
     sender = await event.get_sender()
@@ -77,7 +77,7 @@ async def log_tagged_messages(event):
     hmm = await event.get_chat()
     from .afk import AFK_
 
-    if gvarstatus("GRPLOG") and gvarstatus("GRPLOG") == "false":
+    if gvarstatus(Config.OWNER_ID, "GRPLOG") and gvarstatus(Config.OWNER_ID, "GRPLOG") == "false":
         return
     if (
         (no_log_pms_sql.is_approved(hmm.id))
@@ -211,7 +211,7 @@ async def set_pmlog(event):
         h_type = False
     elif input_str == "تفعيل":
         h_type = True
-    PMLOG = not gvarstatus("PMLOG") or gvarstatus("PMLOG") != "false"
+    PMLOG = not gvarstatus(Config.OWNER_ID, "PMLOG") or gvarstatus(Config.OWNER_ID, "PMLOG") != "false"
     if PMLOG:
         if h_type:
             await event.edit("**- تخزين الخاص بالفعـل ممكـن ✓**")
@@ -249,7 +249,7 @@ async def set_grplog(event):
         h_type = False
     elif input_str == "تفعيل":
         h_type = True
-    GRPLOG = not gvarstatus("GRPLOG") or gvarstatus("GRPLOG") != "false"
+    GRPLOG = not gvarstatus(Config.OWNER_ID, "GRPLOG") or gvarstatus(Config.OWNER_ID, "GRPLOG") != "false"
     if GRPLOG:
         if h_type:
             await event.edit("**- تخزين الكـروبات بالفعـل ممكـن ✓**")

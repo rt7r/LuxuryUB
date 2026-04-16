@@ -55,7 +55,7 @@ class LuxuryClient(TelegramClient):
         kwargs["func"] = kwargs.get("func", lambda e: e.via_bot_id is None)
         kwargs.setdefault("forwards", forword)
         
-        if gvarstatus("blacklist_chats") is not None:
+        if gvarstatus(Config.OWNER_ID, "blacklist_chats") is not None:
             kwargs["blacklist_chats"] = True
             kwargs["chats"] = blacklist_chats_list()
             
@@ -90,7 +90,7 @@ class LuxuryClient(TelegramClient):
 
         def decorator(func):
             async def wrapper(check):
-                if gvarstatus("blockedfrom") == "yes":
+                if gvarstatus(Config.OWNER_ID, "blockedfrom") == "yes":
                     await edit_delete(check, f"**عذراً، أنت محظور من استخدام السورس.\nللمراجعة: {DEV_USER}**")
                     return
                 
@@ -145,7 +145,7 @@ class LuxuryClient(TelegramClient):
                     self.add_event_handler(wrapper, MessageEdited(pattern=REGEX_.regex1, outgoing=True, **kwargs))
                 self.add_event_handler(wrapper, NewMessage(pattern=REGEX_.regex1, outgoing=True, **kwargs))
                 
-                if allow_sudo and gvarstatus("sudoenable") is not None:
+                if allow_sudo and gvarstatus(Config.OWNER_ID, "sudoenable") is not None:
                     if command is None or command[0] in sudo_enabledcmds:
                         sudo_users = _sudousers_list()
                         if edited:

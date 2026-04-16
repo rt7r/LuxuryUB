@@ -23,7 +23,7 @@ def check_owner(func):
                 pass
         else:
             HELP_TEXT = (
-                gvarstatus("HELP_TEXT")
+                gvarstatus(Config.OWNER_ID, "HELP_TEXT")
                 or "هذا الخيار ليس لك، يجب عليك تنصيب سورس لوكجوري بنفسك 💎\nللمساعدة: @ee2ei\nالقناة: @ee2en"
             )
             await c_q.answer(

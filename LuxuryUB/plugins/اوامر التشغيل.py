@@ -63,12 +63,12 @@ async def _(event):
 async def set_pmlog(event):
     input_str = event.pattern_match.group(1)
     if input_str == "ايقاف":
-        if gvarstatus("restartupdate") is None:
+        if gvarstatus(Config.OWNER_ID, "restartupdate") is None:
             return await edit_delete(event, "**᯽︙ تـم تعطيـل التـحديـثات بالفعـل ❗️**")
-        delgvar("restartupdate")
+        delgvar(Config.OWNER_ID, "restartupdate")
         return await edit_or_reply(event, "**⌔︙تـم تعطيـل التـحديـثات بنجـاح ✓**")
-    if gvarstatus("restartupdate") is None:
-        addgvar("restartupdate", "turn-oned")
+    if gvarstatus(Config.OWNER_ID, "restartupdate") is None:
+        addgvar(Config.OWNER_ID, "restartupdate", "turn-oned")
         return await edit_or_reply(event, "**⌔︙تـم تشغيل التـحديـثات بنجـاح ✓**")
     await edit_delete(event, "**᯽︙ تـم تشغيل التـحديـثات بالفعـل ❗️**")
 

@@ -48,16 +48,18 @@ async def setup_bot():
 async def startupmessage():
     if not BOTLOG: return
     try:
-        msg_details = list(get_item_collectionlist("restart_update"))
+        msg_details = list(get_item_collectionlist(Config.OWNER_ID, "restart_update"))
         if msg_details:
             msg_details = msg_details[0]
             message = await luxur.get_messages(msg_details[0], ids=msg_details[1])
             await luxur.edit_message(msg_details[0], msg_details[1], message.text + "\n\n**᯽︙ تم تشغيل لوكجوري بنجاح ✓**")
-            # ✅ التعديل: إضافة OWNER_ID لـ gvarstatus
+            
             if gvarstatus(Config.OWNER_ID, "restartupdate") is not None:
                 await luxur.send_message(msg_details[0], ".بنك", reply_to=msg_details[1], schedule=timedelta(seconds=10))
-            del_keyword_collectionlist("restart_update")
-    except Exception as e: LOGS.error(e)
+            
+            del_keyword_collectionlist(Config.OWNER_ID, "restart_update")
+    except Exception as e: 
+        LOGS.error(e)
 
 async def mybot():
     try:

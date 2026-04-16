@@ -16,7 +16,7 @@ from ..helpers import get_user_from_event, reply_id
 from . import spamwatch
 
 JEP_EM = Config.ID_EM or " •❃ "
-ID_EDIT = gvarstatus("ID_ET") or "ايدي"
+ID_EDIT = gvarstatus(Config.OWNER_ID, "ID_ET") or "ايدي"
 
 plugin_category = "utils"
 LOGS = logging.getLogger(__name__)

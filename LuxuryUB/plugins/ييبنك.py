@@ -46,10 +46,10 @@ async def jokerping(event):
     ms = (end - start).microseconds / 1000
     
     # الجلب من JSON أولاً، ثم SQL كاحتياط، ثم القيمة الافتراضية
-    EMOJI = db.get("ALIVE_EMOJI") or gvarstatus("ALIVE_EMOJI") or "✇ ◅"
-    PING_TEXT = db.get("PING_TEXT") or gvarstatus("PING_TEXT") or "**[ 𝗜 𝗝𝘂𝘀𝘁 𝗔𝘀𝗸𝗲𝗱 𝗙𝗼𝗿 𝗦𝗼𝗺𝗲 𝗣𝗲𝗮𝗰𝗲  ](t.me/mn_qv)**"
-    PING_IMG = db.get("PING_PIC") or gvarstatus("PING_PIC") or "https://files.catbox.moe/r74kqv.jpg"
-    HuRe_caption = db.get("PING_TEMPLATE") or gvarstatus("PING_TEMPLATE") or temp
+    EMOJI = db.get("ALIVE_EMOJI") or gvarstatus(Config.OWNER_ID, "ALIVE_EMOJI") or "✇ ◅"
+    PING_TEXT = db.get("PING_TEXT") or gvarstatus(Config.OWNER_ID, "PING_TEXT") or "**[ 𝗜 𝗝𝘂𝘀𝘁 𝗔𝘀𝗸𝗲𝗱 𝗙𝗼𝗿 𝗦𝗼𝗺𝗲 𝗣𝗲𝗮𝗰𝗲  ](t.me/mn_qv)**"
+    PING_IMG = db.get("PING_PIC") or gvarstatus(Config.OWNER_ID, "PING_PIC") or "https://files.catbox.moe/r74kqv.jpg"
+    HuRe_caption = db.get("PING_TEMPLATE") or gvarstatus(Config.OWNER_ID, "PING_TEMPLATE") or temp
     
     # === سحب اسمك الحقيقي وعمل منشن قابل للضغط ===
     me = await event.client.get_me()

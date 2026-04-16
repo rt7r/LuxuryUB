@@ -762,7 +762,7 @@ remove_admins_aljoker = {}
 
 @luxur.on(events.ChatAction)
 async def Hussein(event):
-    if gvarstatus("Mn3_Kick"):
+    if gvarstatus(Config.OWNER_ID, "Mn3_Kick"):
         if event.user_kicked:
             user_id = event.action_message.from_id
             chat = await event.get_chat()
@@ -835,15 +835,15 @@ aljoker_Menu = set()
 afk_start_time = datetime.now()
 @luxur.on(events.NewMessage)
 async def handle_messages(event):
-    if gvarstatus("5a9_dis"):
+    if gvarstatus(Config.OWNER_ID, "5a9_dis"):
         sender_id = event.sender_id
         current_user_id = await luxur.get_me()
         if event.is_private and sender_id != current_user_id.id:
             await event.delete()
             if sender_id not in aljoker_Menu:
                 aljoker_time = aljoker_waqt()
-                aljoker_message = gvarstatus("aljoker_message") or f"صاحب الحساب قافل خاصة قبل يلا دعبل"
-                aljoker_url = gvarstatus("aljoker_url") or "https://telegra.ph/file/ee30cda28bd1346e54cb3.jpg"
+                aljoker_message = gvarstatus(Config.OWNER_ID, "aljoker_message") or f"صاحب الحساب قافل خاصة قبل يلا دعبل"
+                aljoker_url = gvarstatus(Config.OWNER_ID, "aljoker_url") or "https://telegra.ph/file/ee30cda28bd1346e54cb3.jpg"
                 await luxur.send_file(sender_id, aljoker_url, caption=f'**{aljoker_message}**\n**مدة الغياب: {aljoker_time}**')
                 aljoker_Menu.add(sender_id)
 @luxur.ar_cmd(pattern="الخاص تعطيل")

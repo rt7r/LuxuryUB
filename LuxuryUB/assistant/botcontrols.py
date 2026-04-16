@@ -226,12 +226,12 @@ async def ban_starters(event):
 async def ban_antiflood(event):
     input_str = event.pattern_match.group(1)
     if input_str == "تفعيل":
-        if gvarstatus("bot_antif") is not None:
+        if gvarstatus(Config.OWNER_ID, "bot_antif") is not None:
             return await edit_delete(event, "**وضع منع التكرار مفعل بالأصل**")
         addgvar("bot_antif", True)
         await edit_delete(event, "** تم تفعيل منع التكرار بنجاح**")
     elif input_str == "تعطيل":
-        if gvarstatus("bot_antif") is None:
+        if gvarstatus(Config.OWNER_ID, "bot_antif") is None:
             return await edit_delete(event, "** تم تعطيل منع التكرار بنجاح**")
         delgvar("bot_antif")
         await edit_delete(event, "**وضع منع التكرار معطل بالأصل**")

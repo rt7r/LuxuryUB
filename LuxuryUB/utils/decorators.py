@@ -64,7 +64,7 @@ def admin_cmd(pattern=None, command=None, **args):  # sourcery no-metrics
     elif "incoming" in args and not args["incoming"]:
         args["outgoing"] = True
     
-    if gvarstatus("blacklist_chats") is not None:
+    if gvarstatus(Config.OWNER_ID, "blacklist_chats") is not None:
         args["blacklist_chats"] = True
         args["chats"] = blacklist_chats_list()
     if "allow_edited_updates" in args and args["allow_edited_updates"]:
@@ -120,14 +120,14 @@ def sudo_cmd(pattern=None, command=None, **args):  # sourcery no-metrics
     elif "incoming" in args and not args["incoming"]:
         args["outgoing"] = True
     # add blacklist chats, UB should not respond in these chats
-    if gvarstatus("blacklist_chats") is not None:
+    if gvarstatus(Config.OWNER_ID, "blacklist_chats") is not None:
         args["blacklist_chats"] = True
         args["chats"] = blacklist_chats_list()
     # add blacklist chats, UB should not respond in these chats
     if "allow_edited_updates" in args and args["allow_edited_updates"]:
         del args["allow_edited_updates"]
     # check if the plugin should listen for outgoing 'messages'
-    if gvarstatus("sudoenable") is not None:
+    if gvarstatus(Config.OWNER_ID, "sudoenable") is not None:
         return NewMessage(**args)
 
 
@@ -219,7 +219,7 @@ def register(**args):
         args["outgoing"] = True
 
     # add blacklist chats, UB should not respond in these chats
-    if gvarstatus("blacklist_chats") is not None:
+    if gvarstatus(Config.OWNER_ID, "blacklist_chats") is not None:
         args["blacklist_chats"] = True
         args["chats"] = blacklist_chats_list()
 
@@ -276,7 +276,7 @@ def command(**args):
         del args["allow_sudo"]
     except BaseException:
         pass
-    if gvarstatus("blacklist_chats") is not None:
+    if gvarstatus(Config.OWNER_ID, "blacklist_chats") is not None:
         args["blacklist_chats"] = True
         args["chats"] = blacklist_chats_list()
 

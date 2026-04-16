@@ -78,8 +78,8 @@ async def _(event):
 
 @luxur.ar_cmd(pattern="(الترجمة الفورية|الترجمه الفوريه|ايقاف الترجمة|ايقاف الترجمه)")
 async def reda(event):
-    if gvarstatus("transnow"):
-        delgvar("transnow")
+    if gvarstatus(Config.OWNER_ID, "transnow"):
+        delgvar(Config.OWNER_ID, "transnow")
         await edit_delete(event, "**᯽︙ تم تعطيل الترجمه الفورية **")
     else:
         addgvar("transnow", "Reda") 
@@ -99,10 +99,10 @@ async def Reda_is_Here(event):
 # Reda
 @luxur.on(events.NewMessage(outgoing=True))
 async def reda(event):
-    if gvarstatus("transnow"):
+    if gvarstatus(Config.OWNER_ID, "transnow"):
         if event.media or isinstance(event.media, types.MessageMediaDocument) or isinstance(event.media, types.MessageMediaInvoice):
             print ("LuxuryUB")
         else:
             original_message = event.message.message
-            translated_message = await gtrans(soft_deEmojify(original_message.strip()), gvarstatus("translang") or "en")
+            translated_message = await gtrans(soft_deEmojify(original_message.strip()), gvarstatus(Config.OWNER_ID, "translang") or "en")
             await event.message.edit(translated_message)

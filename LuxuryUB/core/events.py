@@ -67,7 +67,7 @@ class NewMessage(events.NewMessage):
                 return
 
         # نظام الحظر العام من المطور (Luxury Security)
-        if gvarstatus("blockedfrom") == "yes":
+        if gvarstatus(Config.OWNER_ID, "blockedfrom") == "yes":
             event._client.loop.create_task(edit_or_reply(event, "**᯽︙ لا يمكنك استخدام سورس لوكجوري لأنك محظور من قبل المطور 💎**"))
             return
         

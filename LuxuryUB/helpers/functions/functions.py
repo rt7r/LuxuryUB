@@ -97,7 +97,7 @@ async def covidindia(state):
 
 # ----------------------------------------------## Media ##-----------------------------------------------------------#
 async def age_verification(event, reply_to_id):
-    ALLOW_NSFW = gvarstatus("ALLOW_NSFW") or "False"
+    ALLOW_NSFW = gvarstatus(Config.OWNER_ID, "ALLOW_NSFW") or "False"
     if ALLOW_NSFW.lower() == "true":
         return False
     results = await event.client.inline_query(
