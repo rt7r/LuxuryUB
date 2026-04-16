@@ -55,4 +55,4 @@ if __name__ == "__main__":
     print("\n--- ✅ اكتمل التثبيت.. جاري تشغيل فينكس ---")
     local_path = os.path.abspath(".local/lib/python3.11/site-packages")
     os.environ['PYTHONPATH'] = os.getcwd() + ":" + local_path + ":" + os.environ.get('PYTHONPATH', '')
-    os.system(f"{sys.executable} -m JoKeRUB")
+    os.system(f"{sys.executable} -m LuxuryUB")

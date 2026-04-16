@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python3 -m JoKeRUB
+    command: python3 -m LuxuryUB
     restart: on-failure
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db/aljoker

@@ -1,19 +1,29 @@
 from sample_config import Config
+
 class Development(Config):
-    # get this values from the my.telegram.org
-    APP_ID = خلي ايبي ايدي هنا
-    API_HASH = "الايبي هاش"
-    # the name to display in your alive message
-    ALIVE_NAME = "اسمك ع التليجرام"
-    # create any PostgreSQL database (i recommend to use elephantsql) and paste that link here
-    DB_URI = "sqlite:///aljokar.db"
-    # After cloning the repo and installing requirements do python3 telesetup.py an fill that value with this
-    STRING_SESSION = "كود التيرمكس"
-    # create a new bot in @botfather and fill the following vales with bottoken and username respectively
-    TG_BOT_TOKEN = "توكن البوت"
-    # command handler
+    # --- إعدادات الحساب الأساسية (تُجلب من my.telegram.org) ---
+    APP_ID = خلي هنا الاب ايدي
+    API_HASH = "خلي هنا الايبياي هاش"
+
+    ALIVE_NAME = "Luxury User" #غيره وحط اسم حسابك
+    
+    DB_URI = "sqlite:///luxury.db" #لا تغير ولا تسوي اي شي
+
+    # --- الجلسة والتوكن ---
+    STRING_SESSION = "كود الجلسة"
+
+    TG_BOT_TOKEN = "توكن"
+    # توكن البوت المساعد من @BotFather
+
+    #الباقي لا تغير منه اي شي
     COMMAND_HAND_LER = "."
-    # sudo enter the id of sudo users userid's in that array
-    SUDO_USERS = []
-    # command hanler for sudo
     SUDO_COMMAND_HAND_LER = "."
+
+    OWNER_ID = 1165225957 #هنا خلي ايدي حسابك
+    SUDO_USERS = [1165225957] 
+
+    UPSTREAM_REPO = "https://github.com/rt7r/LuxuryUB"
+    UPSTREAM_BRANCH = "main"
+
+    PRIVATE_GROUP_BOT_API_ID = 0 # ايدي كروب السجل (Log)
+    PM_LOGGER_GROUP_ID = 0 # ايدي كروب سجل الخاص

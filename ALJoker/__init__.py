@@ -2,12 +2,12 @@ import sys
 import os
 from typing import Any, Dict, List, Union
 from glob import glob
-from JoKeRUB import *
-from JoKeRUB.helpers.functions.functions import translate
+from LuxuryUB import *
+from LuxuryUB.helpers.functions.functions import translate
 try:
     from yaml import safe_load
 except ModuleNotFoundError:
-    from JoKeRUB.helpers.functions.functions import safe_load
+    from LuxuryUB.helpers.functions.functions import safe_load
 
 os.getenv("LANGUAGE", "ar")
 

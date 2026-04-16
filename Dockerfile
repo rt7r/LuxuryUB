@@ -8,5 +8,5 @@ RUN apt-get install -y nodejs
 RUN npm i -g npm@8.19.4
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
-ENV PATH="/home/JoKeRUB/bin:$PATH"
-CMD python3 -m JoKeRUB
+ENV PATH="/home/LuxuryUB/bin:$PATH"
+CMD python3 -m LuxuryUB

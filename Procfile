@@ -1,1 +1,1 @@
-worker: python3 -m JoKeRUB
+worker: python3 -m LuxuryUB

@@ -1,6 +1,6 @@
 #from here loaded islamic 
 
-from JoKeRUB.Config import roza_config 
+from LuxuryUB.Config import roza_config 
 
 razan = [
 """
