@@ -100,7 +100,7 @@ async def startupmessage():
             message = await luxur.get_messages(msg_details[0], ids=msg_details[1])
             text = message.text + "\n\n**تم تشغيل البوت الآن أرسل `.فحص`**"
             await luxur.edit_message(msg_details[0], msg_details[1], text)
-            if gvarstatus("restartupdate") is not None:
+            if gvarstatus(Config.OWNER_ID, "restartupdate") is not None:
                 await luxur.send_message(
                     msg_details[0],
                     f"{cmdhr}بنك",
@@ -259,13 +259,13 @@ async def verifyLoggerGroup():
         photobt = await luxur.upload_file(file="luxur/razan/resources/start/Luxury.jpg")
         botlog_group_id = await luxury_is_best(luxur, "مجموعة الأشعارات")
         if botlog_group_id:
-            addgvar("PRIVATE_GROUP_BOT_API_ID", botlog_group_id)
+            addgvar("Config.OWNER_ID, PRIVATE_GROUP_BOT_API_ID", botlog_group_id)
             print("᯽︙تم العثور على مجموعة المساعدة بالفعل وإضافتها إلى المتغيرات.")
         else:
             _, groupid = await create_supergroup(
                 "مجموعة اشعارات لوكــجوري", luxur, Config.TG_BOT_USERNAME, descript, photobt
             )
-            addgvar("PRIVATE_GROUP_BOT_API_ID", groupid)
+            addgvar("Config.OWNER_ID, PRIVATE_GROUP_BOT_API_ID", groupid)
             print("᯽︙تم إنشاء مجموعة المسـاعدة بنجاح وإضافتها إلى المتغيرات.")
         flag = True
     if PM_LOGGER_GROUP_ID == -100:
@@ -273,13 +273,13 @@ async def verifyLoggerGroup():
         photobt = await luxur.upload_file(file="luxur/razan/resources/start/Luxury2.jpg")
         pm_logger_group_id = await luxury_is_best(luxur, "مجموعة التخزين")
         if pm_logger_group_id:
-            addgvar("PM_LOGGER_GROUP_ID", pm_logger_group_id)
+            addgvar("Config.OWNER_ID, PM_LOGGER_GROUP_ID", pm_logger_group_id)
             print("تـم العثور على مجموعة كروب التخزين بالفعل وإضافة الـفارات الـيها.")
         else:
             _, groupid = await create_supergroup(
                 "مجموعة التخزين لوكـجوري", luxur, Config.TG_BOT_USERNAME, descript, photobt
             )
-            addgvar("PM_LOGGER_GROUP_ID", groupid)
+            addgvar("Config.OWNER_ID, PM_LOGGER_GROUP_ID", groupid)
             print("تـم عمـل كروب التخزين بنـجاح وإضافة الـفارات الـيه.")
         flag = True
     if flag:
