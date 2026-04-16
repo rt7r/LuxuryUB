@@ -781,12 +781,12 @@ async def Hussein(event):
 
 @luxur.ar_cmd(pattern="منع_التفليش", require_admin=True)
 async def Hussein_aljoker(event):
-    addgvar("Mn3_Kick", True)
+    addgvarConfig.OWNER_ID, ("Mn3_Kick", True)
     await event.edit("**᯽︙ تم تفعيل منع التفليش للمجموعة بنجاح ✓**")
 
 @luxur.ar_cmd(pattern="سماح_التفليش", require_admin=True)
 async def Hussein_aljoker(event):
-    delgvar("Mn3_Kick")
+    delgvar(Config.OWNER_ID, "Mn3_Kick")
     await event.edit("**᯽︙ تم تفعيل منع التفليش للمجموعة بنجاح ✓**")
 message_counts = {}
 enabled_groups = []
@@ -849,13 +849,13 @@ async def handle_messages(event):
 @luxur.ar_cmd(pattern="الخاص تعطيل")
 async def joker5a9(event: Message):
     global afk_start_time
-    addgvar("5a9_dis", True)
+    addgvar(Config.OWNER_ID, "5a9_dis", True)
     afk_start_time = datetime.now()
     await event.edit('**᯽︙ تم قفل الخاص بنجاح الان لا احد يمكنهُ مراسلتك**')
 @luxur.ar_cmd(pattern="الخاص تفعيل")
 async def joker5a9(event: Message):
     global afk_start_time
-    delgvar("5a9_dis")
+    delgvar(Config.OWNER_ID, "5a9_dis")
     afk_start_time = None
     aljoker_Menu.clear()
     await event.edit('**᯽︙ تم تفعيل الخاص بنجاح الان يمكنهم مراسلتك**')

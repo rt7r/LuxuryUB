@@ -216,10 +216,10 @@ async def set_pmlog(event):
         if h_type:
             await event.edit("**- تخزين الخاص بالفعـل ممكـن ✓**")
         else:
-            addgvar("PMLOG", h_type)
+            addgvar(Config.OWNER_ID, "PMLOG", h_type)
             await event.edit("**- تـم تعطيـل تخـزين رسـائل الخـاص .. بنجـاح✓**")
     elif h_type:
-        addgvar("PMLOG", h_type)
+        addgvar(Config.OWNER_ID, "PMLOG", h_type)
         await event.edit("**- تـم تفعيـل تخـزين رسـائل الخـاص .. بنجـاح✓**")
     else:
         await event.edit("**- تخزين الخاص بالفعـل معطـل ✓**")
@@ -254,10 +254,10 @@ async def set_grplog(event):
         if h_type:
             await event.edit("**- تخزين الكـروبات بالفعـل ممكـن ✓**")
         else:
-            addgvar("GRPLOG", h_type)
+            addgvar(Config.OWNER_ID, "GRPLOG", h_type)
             await event.edit("**- تـم تعطيـل تخـزين تاكـات الكـروبات .. بنجـاح✓**")
     elif h_type:
-        addgvar("GRPLOG", h_type)
+        addgvar(Config.OWNER_ID, "GRPLOG", h_type)
         await event.edit("**- تـم تفعيـل تخـزين تاكـات الكـروبات .. بنجـاح✓**")
     else:
         await event.edit("**- تخزين الكـروبات بالفعـل معطـل ✓**")

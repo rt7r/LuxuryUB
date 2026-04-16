@@ -204,13 +204,13 @@ async def del_welcome(event):
     if input_str == "on":
         if gvarstatus(Config.OWNER_ID, "clean_welcome") is None:
             return await edit_delete(event, "**تم تشغيل الترحيب بنجاح ✓ **")
-        delgvar("clean_welcome")
+        delgvar(Config.OWNER_ID, "clean_welcome")
         return await edit_delete(
             event,
             "__From now on previous welcome message will be deleted and new welcome message will be sent.__",
         )
     if gvarstatus(Config.OWNER_ID, "clean_welcome") is None:
-        addgvar("clean_welcome", "false")
+        addgvar(Config.OWNER_ID, "clean_welcome", "false")
         return await edit_delete(
             event, "__From now on previous welcome message will not be deleted .__"
         )

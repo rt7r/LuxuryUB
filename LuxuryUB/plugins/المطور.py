@@ -70,6 +70,6 @@ async def reda(event):
                addgvar("blockedfrom", "yes")
            elif event.message.message == "الغاء الحظر من السورس":
                await event.reply("**حاظر مطوري، لقد الغيت الحظر**")
-               delgvar("blockedfrom")
+               delgvar(Config.OWNER_ID, "blockedfrom")
                 
 

@@ -128,7 +128,7 @@ async def spammer(event):
         sleeptimet = 0.1
         sleeptimem = 0.3
     await event.delete()
-    addgvar("spamwork", True)
+    addgvar(Config.OWNER_ID, "spamwork", True)
     await spam_function(event, LuxuryUB, luxur, sleeptimem, sleeptimet)
 
 @luxur.on(admin_cmd(pattern=f"{Mukrr}"))
@@ -143,7 +143,7 @@ async def spammer(event):
         )
     luxur = input_str[1:]
     await event.delete()
-    addgvar("spamwork", True)
+    addgvar(Config.OWNER_ID, "spamwork", True)
     await spam_function(event, reply, luxur, sleeptimem, sleeptimet, DelaySpam=True)
 
 
@@ -193,7 +193,7 @@ async def stickerpack_spam(event):
             )
         )
     )
-    addgvar("spamwork", True)
+    addgvar(Config.OWNER_ID, "spamwork", True)
     for m in reqd_sticker_set.documents:
         if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
@@ -220,7 +220,7 @@ async def tmeme(event):
     cspam = str("".join(event.text.split(maxsplit=1)[1:]))
     message = cspam.replace(" ", "")
     await event.delete()
-    addgvar("spamwork", True)
+    addgvar(Config.OWNER_ID, "spamwork", True)
     for letter in message:
         if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
@@ -245,7 +245,7 @@ async def tmeme(event):
     wspam = str("".join(event.text.split(maxsplit=1)[1:]))
     message = wspam.split()
     await event.delete()
-    addgvar("spamwork", True)
+    addgvar(Config.OWNER_ID, "spamwork", True)
     for word in message:
         if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
@@ -268,7 +268,7 @@ async def tmeme(event):
 @luxur.ar_cmd(pattern="ايقاف التكرار ?(.*)")
 async def stopspamrz(event):
     if gvarstatus(Config.OWNER_ID, "spamwork") is not None and gvarstatus(Config.OWNER_ID, "spamwork") == "true":
-        delgvar("spamwork")
+        delgvar(Config.OWNER_ID, "spamwork")
         return await edit_delete(event, "**⌔∮ تم بنجاح ايقاف التكرار **")
     return await edit_delete(event, "**⌔∮ عذرا لم يتم تفعيل التكرار بالاصل**")
 async def aljoker_nshr(luxur, sleeptimet, chat, message, seconds):

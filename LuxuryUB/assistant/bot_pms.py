@@ -382,7 +382,7 @@ def is_flood(uid: int) -> Optional[bool]:
 async def settings_toggle(c_q: CallbackQuery):
     if gvarstatus(Config.OWNER_ID, "bot_antif") is None:
         return await c_q.answer(f"بوت قفل التكرار بالفعل معطل.", alert=False)
-    delgvar("bot_antif")
+    delgvar(Config.OWNER_ID"bot_antif")
     await c_q.answer(f"Bot Antiflood disabled.", alert=False)
     await c_q.edit("قفل التكرار تم تعطيله الان !")
 

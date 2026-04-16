@@ -82,7 +82,7 @@ async def reda(event):
         delgvar(Config.OWNER_ID, "transnow")
         await edit_delete(event, "**᯽︙ تم تعطيل الترجمه الفورية **")
     else:
-        addgvar("transnow", "Reda") 
+        addgvar(Config.OWNER_ID, "transnow", "Reda") 
         await edit_delete(event, "**᯽︙ تم تفعيل الترجمه الفورية**")
 
 @luxur.ar_cmd(pattern="لغة الترجمة")
@@ -93,7 +93,7 @@ async def Reda_is_Here(event):
         lang = langs[t]
     except BaseException as er:
         return await edit_delete(event, "**᯽︙ !تأكد من قائمة اللغات. لا يوجد هكذا لغة**")
-    addgvar("translang", lang)
+    addgvar(Config.OWNER_ID, "translang", lang)
     await edit_delete(event, f"**᯽︙ تم تغير لغة الترجمة الى {lang} بنجاح ✓ **")
 
 # Reda

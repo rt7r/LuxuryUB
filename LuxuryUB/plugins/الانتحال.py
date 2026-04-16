@@ -60,18 +60,18 @@ async def _(event):
     oabout = me.about
     if oabout == None:
         oabout = ""
-    addgvar("fname", fname)
-    addgvar("lname", lname)
-    addgvar("oabout", oabout)
+    addgvar(Config.OWNER_ID, "fname", fname)
+    addgvar(Config.OWNER_ID, "lname", lname)
+    addgvar(Config.OWNER_ID, "oabout", oabout)
     await event.client(functions.account.UpdateProfileRequest(first_name=first_name))
     await event.client(functions.account.UpdateProfileRequest(last_name=last_name))
     await event.client(functions.account.UpdateProfileRequest(about=user_bio))
     try:
         await event.client(functions.photos.UploadProfilePhotoRequest(file=await event.client.upload_file(profile_pic)))
     except Exception as e:
-        delgvar("fname")
-        delgvar("lname")
-        delgvar("oabout")
+        delgvar(Config.OWNER_ID, "fname")
+        delgvar(Config.OWNER_ID, "lname")
+        delgvar(Config.OWNER_ID, "oabout")
         return await edit_delete(event, f"**فشل في الانتحال بسبب:**\n__{e}__")
     await edit_delete(event, "**⌁︙تـم نسـخ الـحساب بـنجاح ،✅**")
     if BOTLOG:
@@ -103,9 +103,9 @@ async def _(event):
     await event.client(functions.account.UpdateProfileRequest(first_name=name))
     await event.client(functions.account.UpdateProfileRequest(last_name=blank))
     await edit_delete(event, "⌁︙تـم اعـادة الـحساب بـنجاح ،✅")
-    delgvar("fname")
-    delgvar("lname")
-    delgvar("oabout")
+    delgvar(Config.OWNER_ID, "fname")
+    delgvar(Config.OWNER_ID, "lname")
+    delgvar(Config.OWNER_ID, "oabout")
     if BOTLOG:
         await event.client.send_message(
             BOTLOG_CHATID, f"⌁︙تـم اعادة الـحساب الى وضـعه الاصلـي ،✅")
@@ -132,16 +132,16 @@ async def reda(event):
             ))
         if msg in jeps:
             return await edit_delete(event, "**᯽︙ لا يمكنك انتحال قناة او كروب السورس !**")
-        addgvar(f"{event.chat_id}name", mych.chats[0].title)
-        addgvar(f"{event.chat_id}about", mych.full_chat.about)
+        addgvar(Config.OWNER_ID, f"{event.chat_id}name", mych.chats[0].title)
+        addgvar(Config.OWNER_ID, f"{event.chat_id}about", mych.full_chat.about)
         try:
             await luxur(functions.channels.EditTitleRequest(
                 channel=await luxur.get_entity(event.chat_id),
                 title=result.chats[0].title
             ))
         except ChatAdminRequiredError:
-            delgvar (f"{event.chat_id}name")
-            delgvar (f"{event.chat_id}about")
+            delgvar (Config.OWNER_ID, f"{event.chat_id}name")
+            delgvar (Config.OWNER_ID, f"{event.chat_id}about")
             return await edit_delete(event, "**᯽︙ يجب ان تكون لديك صلاحيات لتغيير الاسم والصورة والبايو لانتحال قناة او كروب**")
         except FloodWaitError:
             return await edit_delete(event, "**انتضر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR خطأ من التيليجرام**")
@@ -195,8 +195,8 @@ async def reda_back(event):
                     functions.photos.DeletePhotosRequest(id=[types.InputPhoto( id=photo.id, access_hash=photo.access_hash, file_reference=photo.file_reference )])
                     )
             await edit_delete(event, "**᯽︙ تم إعادة الكروب/ القناة بنجاح**")
-            delgvar (f"{event.chat_id}name")
-            delgvar (f"{event.chat_id}about")
+            delgvar (Config.OWNER_ID, f"{event.chat_id}name")
+            delgvar (Config.OWNER_ID, f"{event.chat_id}about")
         else:
             await edit_delete(event, "**لم تقم بانتحال قناة او كروب للإعادة**")
     else:
