@@ -231,7 +231,7 @@ async def rozpio2(event):
                                      [Button.inline("🔵 التالي", data="rozpio3")],
                                  ])
     else:
-        await event.answer("انت لا تستطيع استخدام البوت احصل على بوتك من @ee2en" alert=True)
+        await event.answer("انت لا تستطيع استخدام البوت احصل على بوتك من @ee2en", alert=True)
 
 @tgbot.on(events.callbackquery.CallbackQuery(data=re.compile(b"rozpio3")))
 async def rozpio3(event):

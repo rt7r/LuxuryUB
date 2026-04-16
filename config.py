@@ -19,8 +19,11 @@ class Development(Config):
     COMMAND_HAND_LER = "."
     SUDO_COMMAND_HAND_LER = "."
 
-    OWNER_ID = 1165225957 #هنا خلي ايدي حسابك
-    SUDO_USERS = [1165225957] 
+    OWNER_ID = هنا 
+#فوك خلي ايدي حسابك
+    SUDO_USERS = [هنا, 1165225957] 
+#فوك بجانب الايدي المحطوط حط ايدي حسابك مثل: 
+#SUDO_USERS = [123456789, 1165225957] 
 
     UPSTREAM_REPO = "https://github.com/rt7r/LuxuryUB"
     UPSTREAM_BRANCH = "main"
