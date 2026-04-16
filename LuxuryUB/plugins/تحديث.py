@@ -21,11 +21,11 @@ plugin_category = "tools"
 # --- ثوابت التحديث (Luxury Style) ---
 HEROKU_APP_NAME = Config.HEROKU_APP_NAME or None
 HEROKU_API_KEY = Config.HEROKU_API_KEY or None
-UPSTREAM_REPO_URL = Config.UPSTREAM_REPO_URL 
-UPSTREAM_REPO_BRANCH = Config.UPSTREAM_REPO_BRANCH or "main"
+UPSTREAM_REPO_URL = "https://github.com/rt7r/LuxuryUB" 
+UPSTREAM_REPO_BRANCH = "main"
 
 # قائمة المطورين المسموح لهم بالتحديث الإجباري (أنت فقط)
-progs = [Config.OWNER_ID, 1165225957] # آيديك وآيدي مطور السورس الأساسي
+progs = [1165225957] # آيديك وآيدي مطور السورس الأساسي
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -92,7 +92,10 @@ async def deploy(event, repo, ups_rem, ac_br):
     },
 )
 async def upstream(event):
-    conf = event.pattern_match.group(1).strip()
+    if event.sender_id != Config.OWNER_ID:
+        return await edit_or_reply(event, "**❌ عذراً، أمر التحديث مخصص للمالك الأساسي للسورس فقط للحفاظ على استقرار السيرفر.**")
+        
+    conf = event.pattern_match.group(1).strip() if event.pattern_match.group(1) else ""
     event = await edit_or_reply(event, "**᯽︙ جاري البحث عن تحديثات لـ LuxuryUB...**")
     
     try:
@@ -128,11 +131,41 @@ async def upstream(event):
         try:
             ups_rem.pull(UPSTREAM_REPO_BRANCH)
             await update_requirements()
-            await event.edit("**✅ تم تحديث سورس لوكجوري بنجاح! جاري التشغيل...**")
+            
+            # 🔥 نظام خزن الآيدي حتى يجاوبك بعد ما يشتغل
+            try:
+                from ..sql_helper.global_collection import add_item_collectionlist
+                from ..sql_helper.globals import addgvar
+                add_item_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, event.id])
+                addgvar(Config.OWNER_ID, "restartupdate", "true")
+            except Exception as e:
+                LOGS.error(f"Error saving update state: {e}")
+                
+            # 📢 2. إرسال إشعار لكل الحسابات المنصبة (الحسابات الفرعية)
+            try:
+                from ..sql_helper.global_collectionjson import get_collections
+                from telethon import TelegramClient
+                from telethon.sessions import StringSession
+                sub_sessions = get_collections(Config.OWNER_ID)
+                if sub_sessions:
+                    for sess in sub_sessions:
+                        try:
+                            data = sess.json
+                            temp_client = TelegramClient(StringSession(data.get("session")), Config.APP_ID, Config.API_HASH)
+                            await temp_client.connect()
+                            await temp_client.send_message("me", "**᯽︙ تم تحديث سورس لوكجوري من قبل المالك الأساسي إلى أحدث إصدار ✓**")
+                            await temp_client.disconnect()
+                        except Exception:
+                            pass
+            except Exception as e:
+                LOGS.error(f"Error notifying sub-accounts: {e}")
+            
+            # 🔥 رسالة التحديث مدمجة ويه التغييرات
+            await event.edit(f"**✅ تم تحديث سورس لوكجوري بنجاح!**\n\n**📝 التغييرات اللي صارت:**\n{changelog}\n\n**♻️ جاري إعادة التشغيل...**")
             os.execl(sys.executable, sys.executable, "-m", "LuxuryUB")
         except GitCommandError:
             repo.git.reset("--hard", "FETCH_HEAD")
-            await event.edit("**⚠️ تم تصفير التغييرات المحلية والتحديث بنجاح.**")
+            await event.edit("**⚠️ تم تصفير التغييرات المحلية والتحديث بنجاح. أعد تشغيل البوت.**")
 
 # --- أوامر المطورين ---
 

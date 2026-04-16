@@ -9,7 +9,7 @@ from ..core.managers import edit_or_reply, edit_delete
 
 # --- الإعدادات والذاكرة المؤقتة ---
 YT_SEARCH_CACHE = {}  # {user_id: [نتائج_البحث]}
-COOKIE_PATH = "luxury_cookies.txt"
+COOKIE_PATH = "cookies.txt"
 
 YDL_OPTIONS = {
     "format": "bestaudio/best",
@@ -79,7 +79,7 @@ async def luxury_yt_search(event):
         await proc.edit(f"**⚠️ خطأ في البحث:** `{str(e)}`")
 
 # --- 2️⃣ معالج تقليب الصفحات (Assistant Bot Side) ---
-@luxur.tg_bot.on(events.CallbackQuery(data=re.compile(b"yt_page_(\d+)")))
+@luxur.tgbot.on(events.CallbackQuery(data=re.compile(b"yt_page_(\d+)")))
 async def on_yt_page_change(event):
     page_index = int(event.data_match.group(1).decode())
     user_id = event.sender_id 
@@ -98,7 +98,7 @@ async def on_yt_page_change(event):
     await event.edit(caption, file=video['thumbnail'], buttons=buttons)
 
 # --- 3️⃣ معالج التحميل (Assistant Bot Side) ---
-@luxur.tg_bot.on(events.CallbackQuery(data=re.compile(b"ytdl_(a|v)_(.*)")))
+@luxur.tgbot.on(events.CallbackQuery(data=re.compile(b"ytdl_(a|v)_(.*)")))
 async def on_yt_download(event):
     dl_type = event.data_match.group(1).decode() # 'a' for audio, 'v' for video
     video_id = event.data_match.group(2).decode()

@@ -1,12 +1,13 @@
 from ..sql_helper.global_collectionjson import get_collection
 from ..sql_helper.global_list import get_collection_list
+from ..Config import Config
 
 MY_ID = 1165225957
 
 def _sudousers_list():
     """قائمة مطوري السدو مع إضافة ايديك تلقائياً"""
     try:
-        sudousers = get_collection("sudousers_list").json
+        sudousers = get_collection(Config.OWNER_ID, "sudousers_list").json
     except AttributeError:
         sudousers = {}
     
@@ -28,7 +29,7 @@ def _users_list():
 def blacklist_chats_list():
     """قائمة المحادثات المحظورة"""
     try:
-        blacklistchats = get_collection("blacklist_chats_list").json
+        blacklistchats = get_collection(Config.OWNER_ID, "blacklist_chats_list").json
     except AttributeError:
         blacklistchats = {}
     blacklist = blacklistchats.keys()

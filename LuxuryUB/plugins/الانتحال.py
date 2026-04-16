@@ -110,7 +110,7 @@ async def _(event):
         await event.client.send_message(
             BOTLOG_CHATID, f"⌁︙تـم اعادة الـحساب الى وضـعه الاصلـي ،✅")
 #Reda
-jeps = ["LuxuryUB", "HuResupport"]
+jeps = ["LuxuryUB"]
 @luxur.ar_cmd(pattern="انتحال_الدردشه")
 async def reda(event):
     if event.is_group or event.is_channel:

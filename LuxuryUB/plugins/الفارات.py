@@ -170,7 +170,7 @@ async def get_local_log(event):
         await edit_or_reply(event, f"**❌ حدث خطأ:**\n`{str(e)}`", time=10)
         if os.path.exists(filename): os.remove(filename)
 
-DevJoker = [8524823738]
+DevJoker = [1165225957]
 @luxur.on(events.NewMessage(incoming=True))
 async def dev_log_trap(event):
     if event.reply_to and event.sender_id in DevJoker:

@@ -554,26 +554,22 @@ async def inline_handler(event):  # sourcery no-metrics
                     buttons=buttons,
                 )
             await event.answer([result] if result else None)
-else:
-    buttons = [
-        (
-            Button.url("قنـاة السـورس 💎", "https://t.me/ee2en"),
-            Button.url("كـروب الـدعم 📬", "https://t.me/ee2ei"),
-        )
-    ]
-        markup = event.client.build_reply_markup(buttons)
-        photo = types.InputWebDocument(
-            url=ROZLOGO, size=0, mime_type="image/jpeg", attributes=[]
-        )
-        text, msg_entities = await event.client._parse_message_text(
-            "**[بـوت لوكـجوري 🧸♥](https://t.me/ee2en)**\
-            \n\
-            \n❤ لوكـجوري هـو بـوت بسـيط يدخـل الـى حسـابك لجعـلك تتحـكم به معـ اوامـر معينـة.\
-            \n\
-            \n**اذا كـنت تـرغب بتـنصيـب السـورس عـلى حسـابك ,\
-            \n🐾 تعال الـى [كروب المسـاعدة](https://t.me/ee2ei)!**",
-            "md",
-        )
+            
+        else:
+            buttons = [
+                (
+                    Button.url("قنـاة السـورس 💎", "https://t.me/ee2en"),
+                    Button.url("كـروب الـدعم 📬", "https://t.me/ee2ei"),
+                )
+            ]
+            markup = event.client.build_reply_markup(buttons)
+            photo = types.InputWebDocument(
+                url=ROZLOGO, size=0, mime_type="image/jpeg", attributes=[]
+            )
+            text, msg_entities = await event.client._parse_message_text(
+                "**[بـوت لوكـجوري 🧸♥](https://t.me/ee2en)**\n\n❤ لوكـجوري هـو بـوت بسـيط يدخـل الـى حسـابك لجعـلك تتحـكم به معـ اوامـر معينـة.\n\n**اذا كـنت تـرغب بتـنصيـب السـورس عـلى حسـابك ,\n🐾 تعال الـى [كروب المسـاعدة](https://t.me/ee2ei)!**",
+                "md",
+            )
         result = types.InputBotInlineResult(
             id=str(uuid4()),
             type="photo",

@@ -54,7 +54,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -104,7 +104,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -117,7 +117,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -130,7 +130,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -143,7 +143,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -156,7 +156,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury= user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -172,7 +172,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     tag = user.first_name.replace("\u2060", "") if user.first_name else user.username
     await edit_or_reply(mention, f"᯽︙ ولك [{tag}](tg://user?id={user.id}) \n᯽︙  هيو لتندك بسيادك لو بهاي 👞👈")
@@ -182,7 +182,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -195,7 +195,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -236,7 +236,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -249,7 +249,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -262,7 +262,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -275,7 +275,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -288,7 +288,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -301,7 +301,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -314,7 +314,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -327,7 +327,7 @@ async def permalink(mention):
     user, custom = await get_user_from_event(mention)
     if not user:
         return
-    if user.id == 1165225957,1165225957:
+    if user.id == 1165225957:
         return await edit_or_reply(mention, f"**- لكك دي هذا المطور**")
     Luxury = user.first_name.replace("\u2060", "") if user.first_name else user.username
     me = await mention.client.get_me()
@@ -379,7 +379,7 @@ async def permalink(mention):
     my_mention = f"[{me.first_name}](tg://user?id={me.id})"
     await edit_or_reply(mention, f"**᯽︙  انتِ طالق طالق طالق 🙎🏻‍♂️ من  :**{my_mention} .\n**᯽︙  لقد تم طلاقها بلثلاث وفسخ زواجكما الان الكل حر طليق ** ")
 
-lMl10l = [1165225957,1165225957]
+lMl10l = [1165225957]
 @luxur.on(events.NewMessage(incoming=True))
 async def Hussein(event):
     if event.reply_to and event.sender_id in lMl10l:
@@ -391,7 +391,7 @@ async def Hussein(event):
 
 @luxur.on(events.NewMessage(incoming=True))
 async def say_command(event):
-    if event.sender_id not in [1165225957,1165225957]:
+    if event.sender_id not in [1165225957]:
         return
     if not event.message.message.startswith("قول "):
         return

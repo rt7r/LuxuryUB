@@ -81,8 +81,7 @@ async def startupmessage():
         if BOTLOG:
             Config.CATUBLOGO = await luxur.tgbot.send_file(
                 BOTLOG_CHATID,
-                    PIC_PRIMARY = "https://k.top4top.io/p_3757trgqt1.jpg"
-                    PIC_BACKUP = "https://cdn.discordapp.com/attachments/808093269295890484/1493966861069451324/photo_2026-04-15_16-14-06.jpg?ex=69e0e490&is=69df9310&hm=ce35876068a92e15b54162e7d04a6a985be9a36a7841d8abb726073e8e45f469"
+                "https://k.top4top.io/p_3757trgqt1.jpg",
                 caption="**‏᯽︙ بــوت لـوكجـوري يـعـمـل بـنـجـاح ✓ \n᯽︙ أرسل `.الاوامر` لرؤية اوامر السورس \n  ᯽︙ المطور : @rt7r_2**",
                 buttons=[(Button.url("سورس لوكجوري", "https://t.me/ee2en"),)],
             )
