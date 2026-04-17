@@ -44,6 +44,12 @@ authorized_users = {} # {owner_id: set(user_ids)}
 # ⚙️ دالة لتهيئة محرك الاتصال الجديد وتخزينه
 async def get_call_app(client, owner_id):
     if owner_id not in active_calls:
+        # السطر السحري لتغيير اسم الكلاس برمجياً وتخطي فحص المكتبة
+        try:
+            client.__class__.__name__ = 'TelegramClient'
+        except Exception:
+            pass
+            
         app = PyTgCalls(client)
         await app.start()
         active_calls[owner_id] = app
@@ -98,8 +104,7 @@ async def luxury_play(event):
                 await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
                 await asyncio.sleep(2)
                 await call_app.play(chat_id, media_stream)
-            except AlreadyJoinedError:
-                await call_app.play(chat_id, media_stream)
+            
                 
             return await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
@@ -138,8 +143,7 @@ async def luxury_play(event):
                 await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
                 await asyncio.sleep(2)
                 await call_app.play(chat_id, media_stream)
-            except AlreadyJoinedError:
-                await call_app.play(chat_id, media_stream)
+            
                 
             return await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
             
