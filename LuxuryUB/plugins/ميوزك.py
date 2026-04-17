@@ -11,25 +11,107 @@ from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 from pytgcalls.group_call_factory import MTProtoClientType
 
-YDL_OPTIONS = {
-    "format": "bestaudio/best", # يختار أفضل صوت متاح مهما كان نوعه
+from youtubesearchpython import VideosSearch
+from pytgcalls.group_call_factory import GroupCallFactory, MTProtoClientType
+
+YDL_AUDIO_OPTS = {
+    "format": "bestaudio[ext=m4a]/bestaudio/best",
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
-    # 🛡️ أهم إضافة: تخطي حظر التوقيع (Signature) وتغيير المتصفح
+    "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": True,
-    "logtostderr": False,
-    "geo_bypass": True,
-    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    "extractor_args": {
-        "youtube": {
-            "player_client": ["web", "mweb"], # لغينا الأندرويد لأن يضرب الكوكيز
-            "skip": ["dash", "hls"]
-        }
-    }
 }
+
+YDL_VIDEO_OPTS = {
+    "format": "best[ext=mp4]/best",
+    "noplaylist": True,
+    "quiet": True,
+    "no_warnings": True,
+    "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
+    "geo_bypass": True,
+    "nocheckcertificate": True,
+    "ignoreerrors": True,
+}
+
+@luxur.ar_cmd(pattern="(شغل|تشغيل|فيديو|شغل فيديو)( \d+)?(?:\s|$)([\s\S]*)")
+async def luxury_play(event):
+    owner_id = (await event.client.get_me()).id
+    if not is_music_enabled(owner_id):
+        return await edit_delete(event, "**⚠️ نظام الميوزك معطل حالياً، قم بتفعيله أولاً.**")
+
+    cmd = event.pattern_match.group(1)
+    is_forced = bool(event.pattern_match.group(2)) 
+    query = event.pattern_match.group(3)
+    reply = await event.get_reply_message()
+    
+    chat_id = event.chat_id
+    if query and " -id " in query:
+        query, target_id = query.split(" -id ")
+        chat_id = int(target_id.strip())
+
+    proc = await edit_or_reply(event, "**💎 جاري معالجة الطلب وبدء البث ...**")
+    
+    if owner_id not in active_calls:
+        active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
+    
+    call = active_calls[owner_id]
+    
+    is_video = "فيديو" in cmd or (reply and reply.video)
+    
+    try:
+        if query or (reply and reply.text):
+            search_query = query or reply.text
+            
+            if not search_query.startswith("http"):
+                search = VideosSearch(search_query, limit=1)
+                results = search.result()
+                if not results["result"]:
+                    return await proc.edit("**❌ لم يتم العثور على نتائج في يوتيوب.**")
+                url = results["result"][0]["link"]
+                title = results["result"][0]["title"]
+            else:
+                url = search_query
+                title = "يتم جلب البيانات..."
+
+            await proc.edit(f"**💎 جاري استخراج بيانات:** `{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+
+            opts = YDL_VIDEO_OPTS if is_video else YDL_AUDIO_OPTS
+            
+            with YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+                if not info:
+                    return await proc.edit("**❌ فشل في جلب المقطع بسبب حماية يوتيوب.**")
+                stream_url = info.get("url", url)
+                title = info.get("title", title)
+            
+            await call.join(chat_id)
+            if is_video:
+                await call.start_video(stream_url, repeat=not is_forced)
+            else:
+                await call.start_audio(stream_url, repeat=not is_forced)
+                
+            await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+
+        elif reply and (reply.audio or reply.video or reply.voice):
+            await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
+            path = await reply.download_media()
+            await call.join(chat_id)
+            
+            if is_video:
+                await call.start_video(path, repeat=not is_forced)
+            else:
+                await call.start_audio(path, repeat=not is_forced)
+                
+            await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+            
+        else:
+             await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف صوتي/فيديو.**")
+
+    except Exception as e:
+        await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
 # الذاكرة المؤقتة للجلسات والمشغلين
 active_calls = {} # {user_id: group_call_instance}
 authorized_users = {} # {owner_id: set(user_ids)}
@@ -46,68 +128,7 @@ async def toggle_music(event):
     addgvar(owner_id, "MUSIC_STATUS", status)
     await edit_or_reply(event, f"**💎 تم {'تفعيل' if status=='true' else 'تعطيل'} نظام الميوزك بنجاح ✓**")
 
-# ==================== أوامر التشغيل (صوت وفيديو) ====================
-# تأكد إن هذا الاستدعاء موجود بداية الملف، إذا ماكو ضيفه ويه الاستدعاءات فوك
-from pytgcalls.group_call_factory import MTProtoClientType
 
-@luxur.ar_cmd(pattern="(شغل|تشغيل|فيديو|شغل فيديو)( \d+)?(?:\s|$)([\s\S]*)")
-async def luxury_play(event):
-    owner_id = (await event.client.get_me()).id
-    if not is_music_enabled(owner_id):
-        return await edit_delete(event, "**⚠️ نظام الميوزك معطل حالياً، قم بتفعيله أولاً.**")
-
-    cmd = event.pattern_match.group(1)
-    is_forced = bool(event.pattern_match.group(2)) # لشغل 1 وفيديو 1
-    query = event.pattern_match.group(3)
-    reply = await event.get_reply_message()
-    
-    chat_id = event.chat_id
-    # منطق الـ ID الموحد
-    if query and " -id " in query:
-        query, target_id = query.split(" -id ")
-        chat_id = int(target_id.strip())
-
-    proc = await edit_or_reply(event, "**💎 جاري معالجة الطلب وبدء البث ...**")
-    
-    # 🛠️ التعديل المهم هنا: ضفنا (MTProtoClientType.TELETHON) حتى ما يطلب Pyrogram ويطفى
-    if owner_id not in active_calls:
-        active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
-    
-    call = active_calls[owner_id]
-    
-    try:
-        # 1. إذا كان التشغيل من يوتيوب (نص)
-        if query or (reply and reply.text):
-            search_query = query or reply.text
-            with YoutubeDL(YDL_OPTIONS) as ydl:
-                # راح نستخدم الكوكيز والفورمات الجديد اللي سويناه فوك
-                info = ydl.extract_info(f"ytsearch:{search_query}", download=False)["entries"][0]
-                url = info["url"]
-                title = info["title"]
-            
-            await call.join(chat_id)
-            if "فيديو" in cmd:
-                await call.start_video(url, repeat=not is_forced)
-            else:
-                await call.start_audio(url, repeat=not is_forced)
-            await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if 'فيديو' in cmd else 'صوت 🎵'}`")
-
-        # 2. إذا كان التشغيل بالرد على ملف (ملف صوتي أو فيديو بالكروب)
-        elif reply and (reply.audio or reply.video or reply.voice):
-            await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") # ضفتلك هذا حتى تعرف ديحمل
-            path = await reply.download_media()
-            await call.join(chat_id)
-            if reply.video or "فيديو" in cmd:
-                await call.start_video(path)
-            else:
-                await call.start_audio(path)
-            await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**")
-            
-        else:
-             await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف صوتي/فيديو.**")
-
-    except Exception as e:
-        await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
 
 @luxur.ar_cmd(pattern="(تخطي|وقف|اوكف|كمل|خروج|انضمام|مغادرة)(?:\s|$)([\s\S]*)")
 async def music_controls(event):
