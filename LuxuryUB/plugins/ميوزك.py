@@ -9,7 +9,6 @@ from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 from pytgcalls.group_call_factory import MTProtoClientType
 
-from youtubesearchpython import VideosSearch
 from pytgcalls.group_call_factory import GroupCallFactory, MTProtoClientType
 
 # 1. إعدادات يوتيوب للصوت فقط (شلنا القيود الصارمة حتى يقبل أي صيغة صوت)
