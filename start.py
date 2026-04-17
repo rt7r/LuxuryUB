@@ -20,9 +20,9 @@ def install_first_time():
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
         "git+https://github.com/redaiq90/py-googletrans", "git+https://github.com/yt-dlp/yt-dlp", "youtube-search-python", 
-        "pytgcalls==3.0.0.dev24"
+        "py-tgcalls", "av==12.3.0"
     ]
-
+ 
     print("--- 🚀 بدء التثبيت السريع ---")
 
     tmp_dir = os.path.join(os.getcwd(), "tmp_pip")
@@ -30,7 +30,7 @@ def install_first_time():
     os.environ["TMPDIR"] = tmp_dir
     os.environ["TEMP"] = tmp_dir
     os.environ["TMP"] = tmp_dir
-
+    
     batch_size = 25
     total_batches = (len(packages) // batch_size) + 1
 

@@ -10,7 +10,7 @@ from ..sql_helper.globals import gvarstatus, addgvar
 
 # 🚀 تم تغيير الاستدعاءات لتتوافق وية النسخة الرسمية اللي نصبتها
 from pytgcalls import PyTgCalls
-from pytgcalls.types import AudioPiped, AudioVideoPiped
+from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
 from pytgcalls.exceptions import NoActiveGroupCall, AlreadyJoinedError
 
 # 1. إعدادات يوتيوب للصوت فقط
