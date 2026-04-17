@@ -19,7 +19,7 @@ def install_first_time():
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
-        "git+https://github.com/redaiq90/py-googletrans", "git+https://github.com/yt-dlp/yt-dlp", "youtube-search-python"
+        "git+https://github.com/redaiq90/py-googletrans", "git+https://github.com/yt-dlp/yt-dlp", "youtube-search-python", 
         "pytgcalls==3.0.0.dev24"
     ]
 
