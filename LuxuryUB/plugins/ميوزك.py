@@ -11,15 +11,25 @@ from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 from pytgcalls.group_call_factory import MTProtoClientType
 
-# إعدادات يوتيوب الذكية (محاكاة أندرويد + خيار الكوكيز)
 YDL_OPTIONS = {
     "format": "bestaudio/best",
     "noplaylist": True,
     "quiet": True,
+    "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
-    "extractor_args": {"youtube": {"player_client": ["android"]}}, # محاكاة الأندرويد
+    # ❌ حذفنا محاكاة الأندرويد لأنها تضرب الكوكيز
+    "geo_bypass": True,
+    "nocheckcertificate": True,
+    "outtmpl": "downloads/%(id)s.%(ext)s",
+    # 🎙️ إضافة معالج الصوت لضمان توافق الملف مع المكالمة
+    "postprocessors": [
+        {
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "opus",
+            "preferredquality": "192",
+        }
+    ],
 }
-
 # الذاكرة المؤقتة للجلسات والمشغلين
 active_calls = {} # {user_id: group_call_instance}
 authorized_users = {} # {owner_id: set(user_ids)}
@@ -37,6 +47,9 @@ async def toggle_music(event):
     await edit_or_reply(event, f"**💎 تم {'تفعيل' if status=='true' else 'تعطيل'} نظام الميوزك بنجاح ✓**")
 
 # ==================== أوامر التشغيل (صوت وفيديو) ====================
+# تأكد إن هذا الاستدعاء موجود بداية الملف، إذا ماكو ضيفه ويه الاستدعاءات فوك
+from pytgcalls.group_call_factory import MTProtoClientType
+
 @luxur.ar_cmd(pattern="(شغل|تشغيل|فيديو|شغل فيديو)( \d+)?(?:\s|$)([\s\S]*)")
 async def luxury_play(event):
     owner_id = (await event.client.get_me()).id
@@ -56,16 +69,18 @@ async def luxury_play(event):
 
     proc = await edit_or_reply(event, "**💎 جاري معالجة الطلب وبدء البث ...**")
     
+    # 🛠️ التعديل المهم هنا: ضفنا (MTProtoClientType.TELETHON) حتى ما يطلب Pyrogram ويطفى
     if owner_id not in active_calls:
-        active_calls[owner_id] = GroupCallFactory(event.client).get_group_call()
+        active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
     
     call = active_calls[owner_id]
     
     try:
-        # إذا كان التشغيل من يوتيوب
+        # 1. إذا كان التشغيل من يوتيوب (نص)
         if query or (reply and reply.text):
             search_query = query or reply.text
             with YoutubeDL(YDL_OPTIONS) as ydl:
+                # راح نستخدم الكوكيز والفورمات الجديد اللي سويناه فوك
                 info = ydl.extract_info(f"ytsearch:{search_query}", download=False)["entries"][0]
                 url = info["url"]
                 title = info["title"]
@@ -77,8 +92,9 @@ async def luxury_play(event):
                 await call.start_audio(url, repeat=not is_forced)
             await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if 'فيديو' in cmd else 'صوت 🎵'}`")
 
-        # إذا كان التشغيل بالرد على ملف
+        # 2. إذا كان التشغيل بالرد على ملف (ملف صوتي أو فيديو بالكروب)
         elif reply and (reply.audio or reply.video or reply.voice):
+            await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") # ضفتلك هذا حتى تعرف ديحمل
             path = await reply.download_media()
             await call.join(chat_id)
             if reply.video or "فيديو" in cmd:
@@ -86,11 +102,13 @@ async def luxury_play(event):
             else:
                 await call.start_audio(path)
             await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**")
+            
+        else:
+             await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف صوتي/فيديو.**")
 
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
 
-# ==================== أوامر التحكم (تخطي، وقف، كمل) ====================
 @luxur.ar_cmd(pattern="(تخطي|وقف|اوكف|كمل|خروج|انضمام|مغادرة)(?:\s|$)([\s\S]*)")
 async def music_controls(event):
     cmd = event.pattern_match.group(1)
@@ -134,10 +152,11 @@ async def call_manage(event):
             await event.client(functions.phone.CreateGroupCallRequest(peer=event.chat_id))
             await edit_or_reply(event, "**✅ تم فتح المكالمة الصوتية بنجاح.**")
         except:
-             await event.reply(event, "**⚠️ المكالمة مفتوحة بالفعل.**")
+             await event.reply("**⚠️ المكالمة مفتوحة بالفعل.**")
     else:
         await event.client(functions.phone.DiscardGroupCallRequest(
-            call=await event.client(functions.phone.GetGroupCallRequest(peer=event.chat_id))
+            full_chat = await event.client(functions.channels.GetFullChannelRequest(event.chat_id))
+            call = await event.client(functions.phone.GetGroupCallRequest(call=full_chat.full_chat.call, limit=1))
         ))
         await edit_or_reply(event, "**❌ تم إنهاء المكالمة الصوتية.**")
 
@@ -184,10 +203,18 @@ async def rename_call(event):
         return await edit_delete(event, "**💎 يرجى كتابة الاسم الجديد بعد الأمر.**")
     
     try:
-        # جلب بيانات المكالمة وتغيير العنوان
-        call = await event.client(functions.phone.GetGroupCallRequest(peer=event.chat_id))
-        await event.client(functions.phone.EditGroupCallTitleRequest(call=call.call, title=new_title))
+        full_chat = await event.client(functions.channels.GetFullChannelRequest(event.chat_id))
+        
+        if not full_chat.full_chat.call:
+            return await edit_or_reply(event, "**❌ لا توجد مكالمة نشطة حالياً لتغيير اسمها.**")
+            
+        await event.client(functions.phone.EditGroupCallTitleRequest(
+            call=full_chat.full_chat.call, 
+            title=new_title
+        ))
+        
         await edit_or_reply(event, f"**✅ تم تغيير اسم المكالمة إلى :** `{new_title}`")
+        
     except Exception as e:
         await edit_or_reply(event, f"**❌ فشل تغيير الاسم:** `{str(e)}`")
 

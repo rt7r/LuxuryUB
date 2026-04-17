@@ -19,7 +19,7 @@ def install_first_time():
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
-        "googletrans==4.0.0-rc1", "yt-dlp", "youtube-search-python", "pytgcalls>=3.0.0"
+        "googletrans==4.0.0-rc1", "yt-dlp", "youtube-search-python"
     ]
 
     print("--- 🚀 بدء التثبيت السريع ---")

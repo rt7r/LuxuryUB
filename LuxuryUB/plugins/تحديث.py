@@ -128,9 +128,28 @@ async def upstream(event):
         await deploy(event, repo, ups_rem, UPSTREAM_REPO_BRANCH)
     else:
         # نظام التحديث للاستضافات و VPS
+        import shutil
+        import os
+        
+        # 🛡️ حركة الحماية: أخذ نسخة احتياطية من الكونفك قبل التحديث
+        config_path = "config.py"
+        backup_path = "config_backup.temp"
+        if os.path.exists(config_path):
+            shutil.copy(config_path, backup_path)
+            
         try:
             ups_rem.pull(UPSTREAM_REPO_BRANCH)
+        except GitCommandError:
+            repo.git.reset("--hard", "FETCH_HEAD")
+            await event.edit("**⚠️ تم تصفير التغييرات المحلية لتخطي التعارض...**")
+            
+        # 🛡️ إرجاع الكونفك الأصلي مالتك بعد التحديث (غصباً عن الكيت هاب)
+        if os.path.exists(backup_path):
+            shutil.move(backup_path, config_path)
+
+        try:
             await update_requirements()
+            
             
             # 🔥 نظام خزن الآيدي حتى يجاوبك بعد ما يشتغل
             try:
