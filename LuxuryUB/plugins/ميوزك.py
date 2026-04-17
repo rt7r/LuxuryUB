@@ -43,9 +43,13 @@ playlist = {} # {chat_id: [{"title": title, "url": url_or_path, "is_video": bool
 authorized_users = {} # {owner_id: set(user_ids)}
 
 # ==================== دوال التهيئة ====================
+# ==================== دوال التهيئة ====================
 async def get_app(client):
     global call_app
     if call_app is None:
+        # 🚀 الضربة القاضية: نزور هوية الكلاينت حتى تقبله المكتبة غصباً عليها
+        client.__class__.__module__ = "telethon.client.telegramclient"
+        
         call_app = PyTgCalls(client)
         await call_app.start()
         
@@ -58,9 +62,14 @@ async def get_app(client):
                 media = MediaStream(next_item["url"])
                 await call_app.play(chat_id, media)
             else:
-                await call_app.leave_call(chat_id)
+                try:
+                    await call_app.leave_call(chat_id)
+                except:
+                    pass
                 
     return call_app
+        
+
 
 def is_music_enabled(owner_id):
     return gvarstatus(owner_id, "MUSIC_STATUS") == "true"
