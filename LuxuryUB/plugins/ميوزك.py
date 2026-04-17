@@ -140,25 +140,35 @@ async def music_controls(event):
     elif cmd in ["مغادرة", "خروج"]:
         await call.stop()
         del active_calls[owner_id]
-        await edit_or_reply(event, "**⏹️ تم إنهاء البث ومغادرة المكالمة.**")
+        await edit_or_reply(event, "**⏹️ تم مغادرة المكالمة.**")
     elif cmd == "تخطي":
         await edit_or_reply(event, "**⏭️ يتم تخطي المقطع الحالي ...**")
 
-# ==================== إدارة المكالمة (فتح، دعوة، معلومات) ====================
 @luxur.ar_cmd(pattern="(فتح|اطفاء) مكالمة$")
 async def call_manage(event):
     if "فتح" in event.text:
         try:
-            await event.client(functions.phone.CreateGroupCallRequest(peer=event.chat_id))
+            # فتح المكالمة (ضفنا random_id لأن تليثون يطلبه مرات حتى ما يضرب ايرور)
+            await event.client(functions.phone.CreateGroupCallRequest(
+                peer=event.chat_id,
+                random_id=random.randint(10000, 999999999)
+            ))
             await edit_or_reply(event, "**✅ تم فتح المكالمة الصوتية بنجاح.**")
-        except:
+        except Exception as e:
              await event.reply("**⚠️ المكالمة مفتوحة بالفعل.**")
     else:
-        await event.client(functions.phone.DiscardGroupCallRequest(
+        try:
+            # 1. نجيب معلومات الكروب بالبداية
             full_chat = await event.client(functions.channels.GetFullChannelRequest(event.chat_id))
-            call = await event.client(functions.phone.GetGroupCallRequest(call=full_chat.full_chat.call, limit=1))
-        ))
-        await edit_or_reply(event, "**❌ تم إنهاء المكالمة الصوتية.**")
+            
+            # 2. نتحقق إذا اكو مكالمة أصلاً حتى ننهيها
+            if full_chat.full_chat.call:
+                await event.client(functions.phone.DiscardGroupCallRequest(call=full_chat.full_chat.call))
+                await edit_or_reply(event, "**❌ تم إنهاء المكالمة الصوتية.**")
+            else:
+                await event.reply("**⚠️ لا توجد مكالمة نشطة لإنهائها.**")
+        except Exception as e:
+            await edit_or_reply(event, f"**❌ خطأ:** `{str(e)}`")
 
 @luxur.ar_cmd(pattern="معلومات المكالمة$")
 async def call_info(event):
