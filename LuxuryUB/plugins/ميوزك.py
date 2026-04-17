@@ -11,7 +11,7 @@ from ..sql_helper.globals import gvarstatus, addgvar
 # 🚀 التحديث لدعم Pytgcalls الإصدار الثالث فما فوق
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
-from pytgcalls.exceptions import NoActiveGroupCall, AlreadyJoinedError
+from pytgcalls.exceptions import NoActiveGroupCall
 
 # 1. إعدادات يوتيوب للصوت فقط
 YDL_AUDIO_OPTS = {
