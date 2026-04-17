@@ -9,6 +9,7 @@ from LuxuryUB import luxur
 from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
+from pytgcalls.group_call_factory import MTProtoClientType
 
 # إعدادات يوتيوب الذكية (محاكاة أندرويد + خيار الكوكيز)
 YDL_OPTIONS = {
@@ -106,7 +107,7 @@ async def music_controls(event):
     
     if cmd == "انضمام":
         if owner_id not in active_calls:
-            active_calls[owner_id] = GroupCallFactory(event.client).get_group_call()
+            active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
         await active_calls[owner_id].join(chat_id)
         return await edit_or_reply(event, f"**✅ انضم الحساب للمكالمة في :** `{chat_id}`")
 
@@ -132,7 +133,8 @@ async def call_manage(event):
         try:
             await event.client(functions.phone.CreateGroupCallRequest(peer=event.chat_id))
             await edit_or_reply(event, "**✅ تم فتح المكالمة الصوتية بنجاح.**")
-        except: await edit_or_reply(event, "**⚠️ المكالمة مفتوحة بالفعل.**")
+        except:
+             await event.reply(event, "**⚠️ المكالمة مفتوحة بالفعل.**")
     else:
         await event.client(functions.phone.DiscardGroupCallRequest(
             call=await event.client(functions.phone.GetGroupCallRequest(peer=event.chat_id))
