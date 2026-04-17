@@ -26,7 +26,7 @@ def install_first_time():
     print("--- 🚀 بدء التثبيت السريع ---")
 
     # تم جعل الدفعات 26 مكتبة لتسريع المعالجة
-    batch_size = 
+    batch_size = 25
     total_batches = (len(packages) // batch_size) + 1
 
     for i in range(0, len(packages), batch_size):
