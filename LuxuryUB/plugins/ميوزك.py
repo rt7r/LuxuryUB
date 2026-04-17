@@ -7,10 +7,11 @@ from LuxuryUB import luxur
 from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
-from pytgcalls.group_call_factory import MTProtoClientType
 
-from pytgcalls.group_call_factory import GroupCallFactory, MTProtoClientType
-
+# 🚀 تم تغيير الاستدعاءات لتتوافق وية النسخة الرسمية اللي نصبتها
+from pytgcalls import PyTgCalls
+from pytgcalls.types import AudioPiped, AudioVideoPiped
+from pytgcalls.exceptions import NoActiveGroupCall, AlreadyJoinedError
 
 # 1. إعدادات يوتيوب للصوت فقط
 YDL_AUDIO_OPTS = {
@@ -24,7 +25,7 @@ YDL_AUDIO_OPTS = {
     "ignoreerrors": True,
 }
 
-# 2. إعدادات يوتيوب للفيديو (محدثة لتخطي خطأ الفورمات)
+# 2. إعدادات يوتيوب للفيديو
 YDL_VIDEO_OPTS = {
     "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
     "noplaylist": True,
@@ -35,6 +36,30 @@ YDL_VIDEO_OPTS = {
     "nocheckcertificate": True,
     "ignoreerrors": True,
 }
+
+# الذاكرة المؤقتة للجلسات والمشغلين
+active_calls = {} # {owner_id: call_app_instance}
+authorized_users = {} # {owner_id: set(user_ids)}
+
+# ⚙️ دالة لتهيئة محرك الاتصال الجديد وتخزينه
+async def get_call_app(client, owner_id):
+    if owner_id not in active_calls:
+        app = PyTgCalls(client)
+        await app.start()
+        active_calls[owner_id] = app
+    return active_calls[owner_id]
+
+# ==================== دالة التحقق من الخدمة ====================
+def is_music_enabled(owner_id):
+    return gvarstatus(owner_id, "MUSIC_STATUS") == "true"
+
+# ==================== أوامر التحكم بالخدمة ====================
+@luxur.ar_cmd(pattern="(تفعيل|تعطيل) الميوزك$")
+async def toggle_music(event):
+    owner_id = (await event.client.get_me()).id
+    status = "true" if "تفعيل" in event.text else "false"
+    addgvar(owner_id, "MUSIC_STATUS", status)
+    await edit_or_reply(event, f"**💎 تم {'تفعيل' if status=='true' else 'تعطيل'} نظام الميوزك بنجاح ✓**")
 
 @luxur.ar_cmd(pattern="(شغل|تشغيل|فيديو|شغل فيديو)( \d+)?(?:\s|$)([\s\S]*)")
 async def luxury_play(event):
@@ -54,31 +79,32 @@ async def luxury_play(event):
 
     proc = await edit_or_reply(event, "**💎 جاري معالجة الطلب وبدء البث ...**")
     
-    if owner_id not in active_calls:
-        active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
-    
-    call = active_calls[owner_id]
-    
+    # استدعاء المحرك الجديد
+    call_app = await get_call_app(event.client, owner_id)
     is_video = "فيديو" in cmd or (reply and reply.video)
     
     try:
-        # 1. 🚀 التشغيل بالرد على ملف (خليناها بالبداية حتى ما ينخبص وية اليوتيوب)
+        # 1. التشغيل بالرد على ملف
         if reply and (reply.audio or reply.video or reply.voice):
             await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
             path = await reply.download_media()
-            await call.join(chat_id)
             
-            if is_video:
-                await call.start_video(path, repeat=not is_forced)
-            else:
-                await call.start_audio(path, repeat=not is_forced)
+            media_stream = AudioVideoPiped(path) if is_video else AudioPiped(path)
+            
+            try:
+                await call_app.join_group_call(chat_id, media_stream)
+            except NoActiveGroupCall:
+                await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
+                await asyncio.sleep(2)
+                await call_app.join_group_call(chat_id, media_stream)
+            except AlreadyJoinedError:
+                await call_app.change_stream(chat_id, media_stream)
                 
             return await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
         # 2. التشغيل من يوتيوب (نص أو رابط)
         elif query or (reply and reply.text):
             search_query = query or reply.text
-            
             await proc.edit(f"**💎 جاري البحث واستخراج البيانات...**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
             opts = YDL_VIDEO_OPTS if is_video else YDL_AUDIO_OPTS
@@ -102,11 +128,16 @@ async def luxury_play(event):
             if not stream_url:
                  return await proc.edit("**❌ لم يتم العثور على رابط البث المباشر.**")
 
-            await call.join(chat_id)
-            if is_video:
-                await call.start_video(stream_url, repeat=not is_forced)
-            else:
-                await call.start_audio(stream_url, repeat=not is_forced)
+            media_stream = AudioVideoPiped(stream_url) if is_video else AudioPiped(stream_url)
+            
+            try:
+                await call_app.join_group_call(chat_id, media_stream)
+            except NoActiveGroupCall:
+                await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
+                await asyncio.sleep(2)
+                await call_app.join_group_call(chat_id, media_stream)
+            except AlreadyJoinedError:
+                await call_app.change_stream(chat_id, media_stream)
                 
             return await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
             
@@ -115,23 +146,6 @@ async def luxury_play(event):
 
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
-# الذاكرة المؤقتة للجلسات والمشغلين
-active_calls = {} # {user_id: group_call_instance}
-authorized_users = {} # {owner_id: set(user_ids)}
-
-# ==================== دالة التحقق من الخدمة ====================
-def is_music_enabled(owner_id):
-    return gvarstatus(owner_id, "MUSIC_STATUS") == "true"
-
-# ==================== أوامر التحكم بالخدمة ====================
-@luxur.ar_cmd(pattern="(تفعيل|تعطيل) الميوزك$")
-async def toggle_music(event):
-    owner_id = (await event.client.get_me()).id
-    status = "true" if "تفعيل" in event.text else "false"
-    addgvar(owner_id, "MUSIC_STATUS", status)
-    await edit_or_reply(event, f"**💎 تم {'تفعيل' if status=='true' else 'تعطيل'} نظام الميوزك بنجاح ✓**")
-
-
 
 @luxur.ar_cmd(pattern="(تخطي|وقف|اوكف|كمل|خروج|انضمام|مغادرة)(?:\s|$)([\s\S]*)")
 async def music_controls(event):
@@ -145,34 +159,33 @@ async def music_controls(event):
         chat_id = int(query.strip())
 
     owner_id = (await event.client.get_me()).id
-    call = active_calls.get(owner_id)
+    call_app = active_calls.get(owner_id)
     
     if cmd == "انضمام":
-        if owner_id not in active_calls:
-            active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
-        await active_calls[owner_id].join(chat_id)
-        return await edit_or_reply(event, f"**✅ انضم الحساب للمكالمة في :** `{chat_id}`")
+        return await edit_or_reply(event, "**⚠️ يرجى تشغيل مقطع للانضمام للمكالمة.**")
 
-    if not call: return await edit_delete(event, "**⚠️ الحساب ليس في مكالمة حالياً.**")
+    if not call_app: return await edit_delete(event, "**⚠️ الحساب ليس في مكالمة حالياً.**")
 
-    if cmd in ["وقف", "اوكف"]:
-        await call.pause_play()
-        await edit_or_reply(event, "**⏸️ تم إيقاف التشغيل مؤقتاً.**")
-    elif cmd == "كمل":
-        await call.resume_play()
-        await edit_or_reply(event, "**▶️ تم استئناف التشغيل.**")
-    elif cmd in ["مغادرة", "خروج"]:
-        await call.stop()
-        del active_calls[owner_id]
-        await edit_or_reply(event, "**⏹️ تم مغادرة المكالمة.**")
-    elif cmd == "تخطي":
-        await edit_or_reply(event, "**⏭️ يتم تخطي المقطع الحالي ...**")
+    try:
+        if cmd in ["وقف", "اوكف"]:
+            await call_app.pause_stream(chat_id)
+            await edit_or_reply(event, "**⏸️ تم إيقاف التشغيل مؤقتاً.**")
+        elif cmd == "كمل":
+            await call_app.resume_stream(chat_id)
+            await edit_or_reply(event, "**▶️ تم استئناف التشغيل.**")
+        elif cmd in ["مغادرة", "خروج"]:
+            await call_app.leave_group_call(chat_id)
+            await edit_or_reply(event, "**⏹️ تم مغادرة المكالمة.**")
+        elif cmd == "تخطي":
+            await edit_or_reply(event, "**⏭️ يتم تخطي المقطع الحالي ...**")
+    except Exception as e:
+        await edit_or_reply(event, f"**⚠️ حدث خطأ:** `{str(e)}`")
+
 
 @luxur.ar_cmd(pattern="(فتح|اطفاء) مكالمة$")
 async def call_manage(event):
     if "فتح" in event.text:
         try:
-            # فتح المكالمة (ضفنا random_id لأن تليثون يطلبه مرات حتى ما يضرب ايرور)
             await event.client(functions.phone.CreateGroupCallRequest(
                 peer=event.chat_id,
                 random_id=random.randint(10000, 999999999)
@@ -182,10 +195,7 @@ async def call_manage(event):
              await event.reply("**⚠️ المكالمة مفتوحة بالفعل.**")
     else:
         try:
-            # 1. نجيب معلومات الكروب بالبداية
             full_chat = await event.client(functions.channels.GetFullChannelRequest(event.chat_id))
-            
-            # 2. نتحقق إذا اكو مكالمة أصلاً حتى ننهيها
             if full_chat.full_chat.call:
                 await event.client(functions.phone.DiscardGroupCallRequest(call=full_chat.full_chat.call))
                 await edit_or_reply(event, "**❌ تم إنهاء المكالمة الصوتية.**")
@@ -217,16 +227,14 @@ async def manage_operators(event):
 @luxur.ar_cmd(pattern="ايقاف$")
 async def luxury_kill_media(event):
     owner_id = (await event.client.get_me()).id
-    call = active_calls.get(owner_id)
+    call_app = active_calls.get(owner_id)
     
-    if not call:
+    if not call_app:
         return await edit_delete(event, "**💎 الحساب ليس في مكالمة أصلاً.**")
     
     try:
-        # إيقاف البث الصوتي والمرئي نهائياً
-        await call.stop_audio()
-        await call.stop_video()
-        await edit_or_reply(event, "**⏹️ تم إيقاف التشغيل وتصفير المشغل بنجاح ✓**\n*(الحساب لا يزال في المكالمة)*")
+        await call_app.leave_group_call(event.chat_id)
+        await edit_or_reply(event, "**⏹️ تم إيقاف التشغيل وتصفير المشغل بنجاح ✓**\n*(تم الخروج من المكالمة)*")
     except Exception as e:
         await edit_or_reply(event, f"**⚠️ فشل الإيقاف:** `{str(e)}`")
 
@@ -273,12 +281,10 @@ async def operators_listener(event):
 
     # 3. توجيه الأمر للدالة المناسبة (بدون الحاجة لنقطة)
     if trigger in ["شغل", "تشغيل", "فيديو"]:
-        # هنا نستدعي دالة التشغيل ونمرر لها النص بعد كلمة "شغل"
         query = text.replace(trigger, "").strip()
         event.pattern_match = type('Match', (object,), {'group': lambda i: query if i==3 else trigger})
         await luxury_play(event)
         
     elif trigger in ["وقف", "اوكف", "كمل", "تخطي", "ايقاف", "مغادرة", "خروج"]:
-        # توجيه لأوامر التحكم
         event.pattern_match = type('Match', (object,), {'group': lambda i: trigger if i==1 else None})
         await music_controls(event)
