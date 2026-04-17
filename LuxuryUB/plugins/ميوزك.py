@@ -8,9 +8,9 @@ from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 
-# 🚀 تم تغيير الاستدعاءات لتتوافق وية النسخة الرسمية اللي نصبتها
+# 🚀 التحديث لدعم Pytgcalls الإصدار الثالث فما فوق
 from pytgcalls import PyTgCalls
-from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
+from pytgcalls.types import MediaStream
 from pytgcalls.exceptions import NoActiveGroupCall, AlreadyJoinedError
 
 # 1. إعدادات يوتيوب للصوت فقط
@@ -89,16 +89,17 @@ async def luxury_play(event):
             await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
             path = await reply.download_media()
             
-            media_stream = AudioVideoPiped(path) if is_video else AudioPiped(path)
+            # 🚀 استخدام MediaStream الشاملة للإصدار الجديد
+            media_stream = MediaStream(path)
             
             try:
-                await call_app.join_group_call(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
             except NoActiveGroupCall:
                 await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
                 await asyncio.sleep(2)
-                await call_app.join_group_call(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
             except AlreadyJoinedError:
-                await call_app.change_stream(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
                 
             return await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
@@ -128,16 +129,17 @@ async def luxury_play(event):
             if not stream_url:
                  return await proc.edit("**❌ لم يتم العثور على رابط البث المباشر.**")
 
-            media_stream = AudioVideoPiped(stream_url) if is_video else AudioPiped(stream_url)
+            # 🚀 استخدام MediaStream الشاملة للإصدار الجديد
+            media_stream = MediaStream(stream_url)
             
             try:
-                await call_app.join_group_call(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
             except NoActiveGroupCall:
                 await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
                 await asyncio.sleep(2)
-                await call_app.join_group_call(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
             except AlreadyJoinedError:
-                await call_app.change_stream(chat_id, media_stream)
+                await call_app.play(chat_id, media_stream)
                 
             return await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
             
@@ -174,13 +176,12 @@ async def music_controls(event):
             await call_app.resume_stream(chat_id)
             await edit_or_reply(event, "**▶️ تم استئناف التشغيل.**")
         elif cmd in ["مغادرة", "خروج"]:
-            await call_app.leave_group_call(chat_id)
+            await call_app.leave_call(chat_id)
             await edit_or_reply(event, "**⏹️ تم مغادرة المكالمة.**")
         elif cmd == "تخطي":
             await edit_or_reply(event, "**⏭️ يتم تخطي المقطع الحالي ...**")
     except Exception as e:
         await edit_or_reply(event, f"**⚠️ حدث خطأ:** `{str(e)}`")
-
 
 @luxur.ar_cmd(pattern="(فتح|اطفاء) مكالمة$")
 async def call_manage(event):
@@ -233,7 +234,7 @@ async def luxury_kill_media(event):
         return await edit_delete(event, "**💎 الحساب ليس في مكالمة أصلاً.**")
     
     try:
-        await call_app.leave_group_call(event.chat_id)
+        await call_app.leave_call(event.chat_id)
         await edit_or_reply(event, "**⏹️ تم إيقاف التشغيل وتصفير المشغل بنجاح ✓**\n*(تم الخروج من المكالمة)*")
     except Exception as e:
         await edit_or_reply(event, f"**⚠️ فشل الإيقاف:** `{str(e)}`")
