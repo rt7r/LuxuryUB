@@ -19,7 +19,7 @@ def install_first_time():
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
-        "googletrans==4.0.0-rc1", "yt-dlp", "youtube-search-python", "pytgcalls"
+        "googletrans==4.0.0-rc1", "yt-dlp", "youtube-search-python", "pytgcalls>=3.0.0"
     ]
 
     print("--- 🚀 بدء التثبيت السريع ---")
@@ -52,7 +52,7 @@ def install_first_time():
 if __name__ == "__main__":
     install_first_time()
 
-    print("\n--- ✅ اكتمل التثبيت.. جاري تشغيل فينكس ---")
+    print("\n--- ✅ اكتمل التثبيت.. جاري تشغيل لوكـجوري ---")
     local_path = os.path.abspath(".local/lib/python3.11/site-packages")
     os.environ['PYTHONPATH'] = os.getcwd() + ":" + local_path + ":" + os.environ.get('PYTHONPATH', '')
     os.system(f"{sys.executable} -m LuxuryUB")
