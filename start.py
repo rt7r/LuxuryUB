@@ -15,7 +15,7 @@ def install_first_time():
         "google-auth-oauthlib", "gsearch", "gtts", "hachoir", "html-telegraph-poster",
         "humanize", "justwatch", "kwot", "lottie", "jikanpy", "lyricsgenius",
         "markdown", "motor", "patool", "prettytable", "psutil", "pyfiglet",
-        "PyGithub", "programmingquotes", "pygments", "pylast", "covid", "pymediainfo",
+        "PyGithub", "programmingquotes", "pygments", "pylast", "pymediainfo",
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
@@ -26,7 +26,7 @@ def install_first_time():
     print("--- 🚀 بدء التثبيت السريع ---")
 
     # تم جعل الدفعات 26 مكتبة لتسريع المعالجة
-    batch_size = 24
+    batch_size = 
     total_batches = (len(packages) // batch_size) + 1
 
     for i in range(0, len(packages), batch_size):
