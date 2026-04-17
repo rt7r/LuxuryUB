@@ -1,10 +1,11 @@
 import os
 import random
 import asyncio
+import re
 from yt_dlp import YoutubeDL
 from telethon import events, functions
 
-# 🚀 استدعاءات النسخة الأحدث من الكيت هاب (API v5)
+# 🚀 استدعاءات أحدث نسخة من الكيت هاب (API v5)
 from pytgcalls import PyTgCalls
 from pytgcalls.types import MediaStream
 
@@ -37,11 +38,11 @@ YDL_VIDEO_OPTS = {
 }
 
 # ==================== الذاكرة المؤقتة ====================
-call_app = None # محرك الاتصال الأساسي
-playlist = {} # قائمة التشغيل {chat_id: [{"title": title, "url": url_or_path, "is_video": bool}]}
-authorized_users = {} # المشغلين {owner_id: set(user_ids)}
+call_app = None 
+playlist = {} # {chat_id: [{"title": title, "url": url_or_path, "is_video": bool}]}
+authorized_users = {} # {owner_id: set(user_ids)}
 
-# ==================== دوال التهيئة والتحقق ====================
+# ==================== دوال التهيئة ====================
 async def get_app(client):
     global call_app
     if call_app is None:
@@ -64,7 +65,7 @@ async def get_app(client):
 def is_music_enabled(owner_id):
     return gvarstatus(owner_id, "MUSIC_STATUS") == "true"
 
-# ==================== 1. تفعيل وتعطيل الخدمة ====================
+# ==================== 1. تفعيل وتعطيل ====================
 @luxur.ar_cmd(pattern="(تفعيل|تعطيل) الميوزك$")
 async def toggle_music(event):
     owner_id = (await event.client.get_me()).id
@@ -89,37 +90,54 @@ async def manage_operators(event):
     else:
         await edit_or_reply(event, "**⚠️ يرجى الرد على المستخدم لإضافته كمشغل.**")
 
-# ==================== المحرك الأساسي (يجمع التشغيل والتحكم) ====================
-MUSIC_CMDS = "(شغل|تشغيل|شغل1|فيديو|شغل فيديو|فيديو1|انضمام|مغادرة|تخطي|وكف|وقف|كمل|استمرار|ايقاف|قائمة التشغيل)"
+# ==================== المحرك المركزي لمعالجة الأوامر ====================
+# الكلمات المفتاحية كلها هنا
+MUSIC_CMDS = "(شغل 1|شغل فيديو|شغل|تشغيل|فيديو 1|فيديو|انضمام|مغادرة|فتح مكالمة|اطفاء مكالمة|تخطي|وكف مؤقتا|وكف|وقف|كمل|استمرار|ايقاف نهائي|ايقاف|قائمة التشغيل)"
 
 async def process_music_command(event, cmd, target_id_str, query, reply):
     owner_id = (await event.client.get_me()).id
     if not is_music_enabled(owner_id):
         return await event.reply("**⚠️ نظام الميوزك معطل حالياً.**")
 
-    # تحديد الـ ID (الحالي أو الخارجي)
+    # استخراج وتحديد الـ ID
     chat_id = int(target_id_str) if target_id_str else event.chat_id
     app = await get_app(event.client)
     
-    # ---------------- 4. الانضمام / 5. المغادرة ----------------
-    if cmd in ["انضمام"]:
-        # PyTgCalls v5 ينضم تلقائياً مع التشغيل، فنفتح المكالمة فقط للتحضير
+    # ---------------- 6. فتح واغلاق المكالمة ----------------
+    if cmd in ["فتح مكالمة"]:
         try:
             await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
-            return await event.reply("**✅ تم تجهيز المكالمة الصوتية، يرجى تشغيل مقطع.**")
-        except Exception:
-            return await event.reply("**⚠️ المكالمة مفتوحة وجاهزة بالفعل.**")
+            return await event.reply(f"**✅ تم فتح المكالمة الصوتية في :** `{chat_id}`")
+        except:
+            return await event.reply("**⚠️ المكالمة مفتوحة بالفعل.**")
+            
+    if cmd in ["اطفاء مكالمة"]:
+        try:
+            full_chat = await event.client(functions.channels.GetFullChannelRequest(chat_id))
+            if full_chat.full_chat.call:
+                await event.client(functions.phone.DiscardGroupCallRequest(call=full_chat.full_chat.call))
+                return await event.reply(f"**❌ تم إنهاء المكالمة الصوتية في :** `{chat_id}`")
+            return await event.reply("**⚠️ لا توجد مكالمة نشطة لإنهائها.**")
+        except Exception as e:
+            return await event.reply(f"**❌ خطأ:** `{str(e)}`")
 
-    if cmd in ["مغادرة", "ايقاف"]:
+    # ---------------- 4. انضمام / 5. مغادرة ----------------
+    if cmd in ["انضمام"]:
+        try:
+            await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
+        except:
+            pass # إذا مفتوحة غلس
+        return await event.reply("**✅ تم تجهيز المكالمة الصوتية للانضمام، يرجى تشغيل مقطع.**")
+
+    if cmd in ["مغادرة"]:
         try:
             await app.leave_call(chat_id)
-            if chat_id in playlist: playlist[chat_id].clear()
-            return await event.reply("**⏹️ تم مغادرة المكالمة وتصفير القائمة.**")
-        except Exception as e:
-            return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
+            return await event.reply("**⏹️ تم مغادرة المكالمة.**")
+        except:
+            return await event.reply("**⚠️ الحساب ليس في المكالمة أصلاً.**")
 
-    # ---------------- 6. أوامر التحكم ----------------
-    if cmd in ["وكف", "وقف"]:
+    # ---------------- أوامر التحكم ----------------
+    if cmd in ["وكف مؤقتا", "وكف", "وقف"]:
         await app.pause(chat_id)
         return await event.reply("**⏸️ تم إيقاف التشغيل مؤقتاً.**")
         
@@ -127,14 +145,22 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
         await app.resume(chat_id)
         return await event.reply("**▶️ تم استئناف التشغيل.**")
         
+    if cmd in ["ايقاف نهائي", "ايقاف"]:
+        try:
+            await app.leave_call(chat_id)
+        except: pass
+        if chat_id in playlist: playlist[chat_id].clear() # تصفير القائمة
+        return await event.reply("**⏹️ تم إيقاف التشغيل نهائياً وتصفير قائمة التشغيل.**")
+        
     if cmd in ["تخطي"]:
         if chat_id in playlist and len(playlist[chat_id]) > 0:
             next_item = playlist[chat_id].pop(0)
             await app.play(chat_id, MediaStream(next_item["url"]))
             return await event.reply(f"**⏭️ تم التخطي، يتم الآن تشغيل:** `{next_item['title']}`")
         else:
-            await app.leave_call(chat_id)
-            return await event.reply("**⏹️ القائمة فارغة، تم مغادرة المكالمة.**")
+            try: await app.leave_call(chat_id) 
+            except: pass
+            return await event.reply("**⏹️ القائمة فارغة، تم إيقاف التشغيل.**")
             
     if cmd in ["قائمة التشغيل"]:
         if chat_id not in playlist or len(playlist[chat_id]) == 0:
@@ -144,10 +170,12 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
             text += f"**{i}.** `{item['title']}`\n"
         return await event.reply(text)
 
-    # ---------------- 2. و 3. التشغيل (صوت وفيديو) ----------------
-    if cmd in ["شغل", "تشغيل", "شغل1", "فيديو", "شغل فيديو", "فيديو1"]:
+    # ---------------- 2. و 3. التشغيل بكل أنواعه ----------------
+    if cmd in ["شغل", "تشغيل", "شغل 1", "فيديو", "شغل فيديو", "فيديو 1"]:
         proc = await event.reply("**💎 جاري معالجة الطلب وبدء البث ...**")
+        
         is_video = "فيديو" in cmd or (reply and reply.video)
+        is_force = "1" in cmd # هل هو تشغيل إجباري (شغل 1 أو فيديو 1)؟
         
         url_or_path = ""
         title = ""
@@ -183,19 +211,22 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
             if not url_or_path:
                 return await proc.edit("**❌ فشل في استخراج رابط البث.**")
 
-            # 🧠 الذكاء هنا: التشغيل أو الإضافة للطابور
             media = MediaStream(url_or_path)
+            
+            # إذا تشغيل إجباري (شغل 1)، صفر القائمة
+            if is_force:
+                if chat_id in playlist: playlist[chat_id].clear()
             
             # فحص إذا اكو شي يشتغل حالياً
             active_call = app.active_calls.get(chat_id)
             
-            if active_call:
+            if active_call and not is_force:
                 # إضافة للطابور
                 if chat_id not in playlist: playlist[chat_id] = []
                 playlist[chat_id].append({"title": title, "url": url_or_path, "is_video": is_video})
                 return await proc.edit(f"**⏳ تمت الإضافة إلى قائمة التشغيل:**\n`{title}`\n**الترتيب:** `{len(playlist[chat_id])}`")
             else:
-                # تشغيل مباشر
+                # تشغيل مباشر (أو إجباري)
                 try:
                     await app.play(chat_id, media)
                 except Exception as e:
@@ -210,7 +241,7 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
         except Exception as e:
             return await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
 
-# ==================== استقبال الأوامر (للمالك) ====================
+# ==================== استقبال أوامر المالك ====================
 @luxur.ar_cmd(pattern=f"{MUSIC_CMDS}(?: -id (-\d+|\d+))?(?:\s|$)([\s\S]*)")
 async def owner_music_handler(event):
     cmd = event.pattern_match.group(1)
@@ -219,29 +250,29 @@ async def owner_music_handler(event):
     reply = await event.get_reply_message()
     await process_music_command(event, cmd, target_id_str, query, reply)
 
-# ==================== استقبال الأوامر (للمشغلين) ====================
+# ==================== استقبال أوامر المشغلين ====================
 @luxur.on(events.NewMessage(incoming=True))
 async def operator_listener(event):
     owner_id = (await event.client.get_me()).id
     sender_id = event.sender_id
     
-    # فلترة: هل هو مشغل؟
+    # 1. هل الشخص مشغل معتمد؟
     if sender_id not in authorized_users.get(owner_id, set()):
         return
         
     text = event.raw_text.strip()
-    # التحقق هل النص يبدأ بأحد الأوامر المسموحة؟ (باستثناء تفعيل/تعطيل)
-    import re
-    match = re.match(f"^{MUSIC_CMDS}(?: -id (-\d+|\d+))?(?:\s|$)([\s\S]*)", text)
     
+    # 2. مطابقة الأوامر
+    match = re.match(f"^{MUSIC_CMDS}(?: -id (-\d+|\d+))?(?:\s|$)([\s\S]*)", text)
     if match:
         cmd = match.group(1)
         target_id_str = match.group(2)
         query = match.group(3).strip() if match.group(3) else None
         reply = await event.get_reply_message()
         
-        # منع المشغل من المغادرة (حسب طلبك)
-        if cmd in ["مغادرة", "ايقاف"]:
-            return await event.reply("**⚠️ عذراً، لا تمتلك صلاحية إيقاف أو مغادرة المكالمة.**")
+        # 3. حظر المشغل من الأوامر الممنوعة (المغادرة والاطفاء والايقاف النهائي)
+        forbidden_cmds = ["مغادرة", "ايقاف نهائي", "اطفاء مكالمة"]
+        if cmd in forbidden_cmds:
+            return await event.reply("**⚠️ عذراً، لا تمتلك صلاحية لهذا الأمر.**")
             
         await process_music_command(event, cmd, target_id_str, query, reply)
