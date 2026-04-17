@@ -19,13 +19,14 @@ def install_first_time():
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
-        "googletrans==4.0.0-rc1", "yt-dlp", "youtube-search-python"
+        "git+https://github.com/redaiq90/py-googletrans", "git+https://github.com/yt-dlp/yt-dlp", "git+https://github.com/alexmercerind/youtube-search-python"
+        "pytgcalls==3.0.0.dev24"
     ]
 
     print("--- 🚀 بدء التثبيت السريع ---")
 
     # تم جعل الدفعات 26 مكتبة لتسريع المعالجة
-    batch_size = 26
+    batch_size = 24
     total_batches = (len(packages) // batch_size) + 1
 
     for i in range(0, len(packages), batch_size):

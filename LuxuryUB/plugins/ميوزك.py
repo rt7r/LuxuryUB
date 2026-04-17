@@ -2,8 +2,6 @@ import asyncio
 import os
 import random
 from yt_dlp import YoutubeDL
-from pytgcalls import GroupCallFactory
-from pytgcalls.exceptions import GroupCallNotFoundError
 from telethon import events, functions, types
 from LuxuryUB import luxur
 from ..Config import Config
@@ -14,8 +12,9 @@ from pytgcalls.group_call_factory import MTProtoClientType
 from youtubesearchpython import VideosSearch
 from pytgcalls.group_call_factory import GroupCallFactory, MTProtoClientType
 
+# 1. إعدادات يوتيوب للصوت فقط (شلنا القيود الصارمة حتى يقبل أي صيغة صوت)
 YDL_AUDIO_OPTS = {
-    "format": "bestaudio[ext=m4a]/bestaudio/best",
+    "format": "bestaudio/best", 
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
@@ -25,6 +24,7 @@ YDL_AUDIO_OPTS = {
     "ignoreerrors": True,
 }
 
+# 2. إعدادات يوتيوب للفيديو
 YDL_VIDEO_OPTS = {
     "format": "best[ext=mp4]/best",
     "noplaylist": True,
@@ -62,31 +62,35 @@ async def luxury_play(event):
     is_video = "فيديو" in cmd or (reply and reply.video)
     
     try:
+        # 1. التشغيل من يوتيوب (نص أو رابط)
         if query or (reply and reply.text):
             search_query = query or reply.text
             
-            if not search_query.startswith("http"):
-                search = VideosSearch(search_query, limit=1)
-                results = search.result()
-                if not results["result"]:
-                    return await proc.edit("**❌ لم يتم العثور على نتائج في يوتيوب.**")
-                url = results["result"][0]["link"]
-                title = results["result"][0]["title"]
-            else:
-                url = search_query
-                title = "يتم جلب البيانات..."
-
-            await proc.edit(f"**💎 جاري استخراج بيانات:** `{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+            await proc.edit(f"**💎 جاري البحث واستخراج البيانات...**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
             opts = YDL_VIDEO_OPTS if is_video else YDL_AUDIO_OPTS
             
             with YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(url, download=False)
+                # 🚀 الذكاء هنا: إذا مو رابط، نخلي yt-dlp هو يبحث بنفسه بالطريقة الصحيحة
+                if not search_query.startswith("http"):
+                    info = ydl.extract_info(f"ytsearch:{search_query}", download=False)
+                    # ناخذ أول نتيجة من البحث
+                    if info and 'entries' in info and info['entries']:
+                        info = info['entries'][0] 
+                    else:
+                        return await proc.edit("**❌ لم يتم العثور على نتائج في يوتيوب.**")
+                else:
+                    info = ydl.extract_info(search_query, download=False)
+                
                 if not info:
                     return await proc.edit("**❌ فشل في جلب المقطع بسبب حماية يوتيوب.**")
-                stream_url = info.get("url", url)
-                title = info.get("title", title)
+                
+                stream_url = info.get("url")
+                title = info.get("title", "مقطع غير معروف")
             
+            if not stream_url:
+                 return await proc.edit("**❌ لم يتم العثور على رابط البث المباشر.**")
+
             await call.join(chat_id)
             if is_video:
                 await call.start_video(stream_url, repeat=not is_forced)
@@ -95,6 +99,7 @@ async def luxury_play(event):
                 
             await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
 
+        # 2. التشغيل بالرد على ملف
         elif reply and (reply.audio or reply.video or reply.voice):
             await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
             path = await reply.download_media()
