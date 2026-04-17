@@ -25,6 +25,12 @@ def install_first_time():
 
     print("--- 🚀 بدء التثبيت السريع ---")
 
+    tmp_dir = os.path.join(os.getcwd(), "tmp_pip")
+    os.makedirs(tmp_dir, exist_ok=True)
+    os.environ["TMPDIR"] = tmp_dir
+    os.environ["TEMP"] = tmp_dir
+    os.environ["TMP"] = tmp_dir
+
     batch_size = 25
     total_batches = (len(packages) // batch_size) + 1
 

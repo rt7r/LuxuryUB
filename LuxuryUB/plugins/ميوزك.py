@@ -11,7 +11,8 @@ from pytgcalls.group_call_factory import MTProtoClientType
 
 from pytgcalls.group_call_factory import GroupCallFactory, MTProtoClientType
 
-# 1. إعدادات يوتيوب للصوت فقط (شلنا القيود الصارمة حتى يقبل أي صيغة صوت)
+
+# 1. إعدادات يوتيوب للصوت فقط
 YDL_AUDIO_OPTS = {
     "format": "bestaudio/best", 
     "noplaylist": True,
@@ -23,9 +24,9 @@ YDL_AUDIO_OPTS = {
     "ignoreerrors": True,
 }
 
-# 2. إعدادات يوتيوب للفيديو
+# 2. إعدادات يوتيوب للفيديو (محدثة لتخطي خطأ الفورمات)
 YDL_VIDEO_OPTS = {
-    "format": "best[ext=mp4]/best",
+    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
@@ -61,8 +62,21 @@ async def luxury_play(event):
     is_video = "فيديو" in cmd or (reply and reply.video)
     
     try:
-        # 1. التشغيل من يوتيوب (نص أو رابط)
-        if query or (reply and reply.text):
+        # 1. 🚀 التشغيل بالرد على ملف (خليناها بالبداية حتى ما ينخبص وية اليوتيوب)
+        if reply and (reply.audio or reply.video or reply.voice):
+            await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
+            path = await reply.download_media()
+            await call.join(chat_id)
+            
+            if is_video:
+                await call.start_video(path, repeat=not is_forced)
+            else:
+                await call.start_audio(path, repeat=not is_forced)
+                
+            return await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+
+        # 2. التشغيل من يوتيوب (نص أو رابط)
+        elif query or (reply and reply.text):
             search_query = query or reply.text
             
             await proc.edit(f"**💎 جاري البحث واستخراج البيانات...**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
@@ -70,10 +84,8 @@ async def luxury_play(event):
             opts = YDL_VIDEO_OPTS if is_video else YDL_AUDIO_OPTS
             
             with YoutubeDL(opts) as ydl:
-                # 🚀 الذكاء هنا: إذا مو رابط، نخلي yt-dlp هو يبحث بنفسه بالطريقة الصحيحة
                 if not search_query.startswith("http"):
                     info = ydl.extract_info(f"ytsearch:{search_query}", download=False)
-                    # ناخذ أول نتيجة من البحث
                     if info and 'entries' in info and info['entries']:
                         info = info['entries'][0] 
                     else:
@@ -96,23 +108,10 @@ async def luxury_play(event):
             else:
                 await call.start_audio(stream_url, repeat=not is_forced)
                 
-            await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
-
-        # 2. التشغيل بالرد على ملف
-        elif reply and (reply.audio or reply.video or reply.voice):
-            await proc.edit("**📥 جاري تحميل الملف للاستضافة لتشغيله...**") 
-            path = await reply.download_media()
-            await call.join(chat_id)
-            
-            if is_video:
-                await call.start_video(path, repeat=not is_forced)
-            else:
-                await call.start_audio(path, repeat=not is_forced)
-                
-            await proc.edit(f"**✅ تم تشغيل الملف المرفق بنجاح ✓**\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+            return await proc.edit(f"**🎶 يتم الآن تشغيل :**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
             
         else:
-             await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف صوتي/فيديو.**")
+             return await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف صوتي/فيديو.**")
 
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ:** `{str(e)}`")
