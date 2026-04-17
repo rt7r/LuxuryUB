@@ -12,23 +12,23 @@ from ..sql_helper.globals import gvarstatus, addgvar
 from pytgcalls.group_call_factory import MTProtoClientType
 
 YDL_OPTIONS = {
-    "format": "bestaudio/best",
+    "format": "bestaudio/best", # يختار أفضل صوت متاح مهما كان نوعه
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
-    # ❌ حذفنا محاكاة الأندرويد لأنها تضرب الكوكيز
-    "geo_bypass": True,
+    # 🛡️ أهم إضافة: تخطي حظر التوقيع (Signature) وتغيير المتصفح
     "nocheckcertificate": True,
-    "outtmpl": "downloads/%(id)s.%(ext)s",
-    # 🎙️ إضافة معالج الصوت لضمان توافق الملف مع المكالمة
-    "postprocessors": [
-        {
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "opus",
-            "preferredquality": "192",
+    "ignoreerrors": True,
+    "logtostderr": False,
+    "geo_bypass": True,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "extractor_args": {
+        "youtube": {
+            "player_client": ["web", "mweb"], # لغينا الأندرويد لأن يضرب الكوكيز
+            "skip": ["dash", "hls"]
         }
-    ],
+    }
 }
 # الذاكرة المؤقتة للجلسات والمشغلين
 active_calls = {} # {user_id: group_call_instance}
