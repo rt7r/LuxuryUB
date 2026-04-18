@@ -12,11 +12,11 @@ from googletrans import Translator
 from ..utils.extdl import install_pip
 from ..utils.utils import runcmd
 
-try:
-    from imdb import Cinemagoer
-except ModuleNotFoundError:
-    install_pip("cinemagoer")
-    from imdb import Cinemagoer
+#try:
+#    from imdb import IMDb
+#except ModuleNotFoundError:
+#    install_pip("IMDbPY")
+#    from imdb import IMDb
 
 from PIL import Image, ImageColor, ImageDraw, ImageFont, ImageOps
 from telethon.errors.rpcerrorlist import YouBlockedUserError
@@ -26,8 +26,7 @@ from ...Config import Config
 from ...sql_helper.globals import gvarstatus
 from ..resources.states import states
 
-# استخدام الكلاس الحديث للمكتبة
-imdb = Cinemagoer()
+#imdb = IMDb()
 
 mov_titles = [
     "long imdb title",
@@ -37,6 +36,7 @@ mov_titles = [
     "canonical title",
     "localized title",
 ]
+
 # ----------------------------------------------## Scrap ##------------------------------------------------------------#
 
 
