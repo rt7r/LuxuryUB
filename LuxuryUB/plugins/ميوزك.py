@@ -209,7 +209,13 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
                     info = ydl.extract_info(search_query, download=False)
                     if info and 'entries' in info and info['entries']: info = info['entries'][0] 
                     if not info: return await proc.edit("**❌ لم يتم العثور على نتائج.**")
-                    url_or_path = info.get("url")
+                    formats = info.get("formats", [])
+                    url_or_path = None
+
+                    for f in formats[::-1]:
+                        if f.get("url") and f.get("acodec") != "none":
+                            url_or_path = f["url"]
+                            break
                     title = info.get("title", "مقطع غير معروف")
             else:
                 return await proc.edit("**⚠️ يرجى كتابة اسم الأغنية أو الرد على ملف.**")
