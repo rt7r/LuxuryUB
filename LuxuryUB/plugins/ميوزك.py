@@ -11,8 +11,10 @@ from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 
 
+# ==================== الإعدادات المتطورة ====================
+# 🔓 إضافة worst (أسوأ صيغة) كخيار أخير حتى لا يرفض أي مقطع شورتس أو قديم
 YDL_AUDIO_OPTS = {
-    "format": "bestaudio/best", 
+    "format": "bestaudio/best/worst", 
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
@@ -20,16 +22,11 @@ YDL_AUDIO_OPTS = {
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": True,
-    "default_search": "ytsearch",
-    "postprocessors": [{
-        "key": "FFmpegExtractAudio",
-        "preferredcodec": "m4a",
-        "preferredquality": "320",
-    }]
+    "default_search": "ytsearch"
 }
 
 YDL_VIDEO_OPTS = {
-    "format": "best", 
+    "format": "bestvideo+bestaudio/best/worst", 
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
@@ -37,13 +34,8 @@ YDL_VIDEO_OPTS = {
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": True,
-    "default_search": "ytsearch",
-    "postprocessors": [{
-        "key": "FFmpegVideoConvertor",
-        "preferedformat": "mp4"
-    }]
+    "default_search": "ytsearch"
 }
-
 # ==================== الذاكرة المؤقتة (Smart Tracking) ====================
 active_calls = {} 
 is_playing = {} 
