@@ -2,14 +2,14 @@ version: '3.3'
 
 services:
  app:
-    container_name: aljoker
+    container_name: luxury
     build:
       context: .
       dockerfile: Dockerfile
     command: python3 -m LuxuryUB
     restart: on-failure
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db/aljoker
+      - DATABASE_URL=postgresql://postgres:postgres@db/luxury
     depends_on:
       - db
 
@@ -19,7 +19,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=aljoker
+      - POSTGRES_DB=luxury
     volumes:
       - db:/var/lib/postgresql/data
 volumes:

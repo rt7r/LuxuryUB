@@ -20,7 +20,7 @@ def install_first_time():
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
         "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
         "git+https://github.com/redaiq90/py-googletrans", "git+https://github.com/yt-dlp/yt-dlp", "youtube-search-python", 
-        "py-tgcalls"
+        "pytgcalls==3.0.0.dev24", "av==12.3.0"
     ]
  
     print("--- 🚀 بدء التثبيت السريع ---")

@@ -31,7 +31,6 @@ its_hussein = False
 its_reda = False
 its_joker = False
 #اياثارات الحسين
-#by Aljoker doesn't steal codes Please
 @luxur.on(events.NewMessage(incoming=True))
 async def Hussein(event):
     if event.message.message.startswith("تجميع المليار") and str(event.sender_id) in ConsoleJoker:
@@ -434,9 +433,9 @@ async def _(event):
             break
         msg_text = msgs.message  # الكود تمت كتابتهُ من قبل سورس الجوكر 
         if "اشترك فالقناة @" in msg_text:
-            aljoker_channel = msg_text.split('@')[1].split()[0]
+            luxury_channel = msg_text.split('@')[1].split()[0]
             try:
-                entity = await luxur.get_entity(aljoker_channel)
+                entity = await luxur.get_entity(luxury_channel)
                 if entity:
                     await luxur(JoinChannelRequest(entity.id))
                     await asyncio.sleep(4)

@@ -15,7 +15,7 @@ languages = {}
 
 
 
-for file in glob("ALJoker/strings/*yml"):
+for file in glob("alLuxury/strings/*yml"):
     if file.endswith(".yml"):
         code = file.split("/")[-1].split("\\")[-1][:-4]
         try:

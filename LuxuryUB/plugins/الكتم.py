@@ -22,7 +22,7 @@ joker_mute = "https://files.catbox.moe/8zkt8e.jpg"
 joker_unmute = "https://files.catbox.moe/5mlc99.jpg"
 import os
 
-file_path = 'AljokerMute.txt'
+file_path = 'LuxuryMute.txt'
 
 if not os.path.isfile(file_path):
     open(file_path, 'w').close()

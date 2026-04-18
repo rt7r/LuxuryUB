@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime
-from ALJoker import languages
+from alLuxury import languages
 from telethon.tl import functions, types
 from LuxuryUB.helpers.functions.functions import translate 
 from LuxuryUB import CMD_HELP, luxur

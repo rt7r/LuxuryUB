@@ -252,7 +252,7 @@ async def _(event):
             )
     else:
         await edit_or_reply(event, f"᯽︙ الـدردشـة الـحالية : `{str(event.chat_id)}`")
-#by Reda For aljoker 🤡
+
 @luxur.ar_cmd(
     pattern=r"كشف_ايدي(?: (\d+))?$",
     command=("كشف_ايدي", "utils"),

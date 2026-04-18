@@ -13,7 +13,7 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from LuxuryUB import luxur
 from ..helpers.utils import reply_id
 plugin_category = "tools"
-# الي يخمط ويكول من كتابتي الا امه انيجه وقد اعذر من انذر
+
     
 @luxur.on(admin_cmd(pattern="حالتي ?(.*)"))
 async def _(event):
