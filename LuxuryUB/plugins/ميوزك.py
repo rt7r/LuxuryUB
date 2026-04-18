@@ -10,9 +10,7 @@ from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 
-# ==================== الإعدادات المتطورة ====================
-# 🛡️ تم إزالة حيلة الأندرويد والاعتماد على الكوكيز فقط
-# 🔓 تم إزالة قيود الصيغ (mp4/m4a) حتى يقبل البوت أي صيغة يرسلها اليوتيوب بدون أخطاء
+
 YDL_AUDIO_OPTS = {
     "format": "bestaudio/best", 
     "noplaylist": True,
@@ -21,18 +19,29 @@ YDL_AUDIO_OPTS = {
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
     "geo_bypass": True,
     "nocheckcertificate": True,
-    "ignoreerrors": True
+    "ignoreerrors": True,
+    "default_search": "ytsearch",
+    "postprocessors": [{
+        "key": "FFmpegExtractAudio",
+        "preferredcodec": "m4a",
+        "preferredquality": "320",
+    }]
 }
 
 YDL_VIDEO_OPTS = {
-    "format": "bestvideo[height<=720]+bestaudio/best[height<=720]/best", 
+    "format": "best", 
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
     "geo_bypass": True,
     "nocheckcertificate": True,
-    "ignoreerrors": True
+    "ignoreerrors": True,
+    "default_search": "ytsearch",
+    "postprocessors": [{
+        "key": "FFmpegVideoConvertor",
+        "preferedformat": "mp4"
+    }]
 }
 
 # ==================== الذاكرة المؤقتة (Smart Tracking) ====================
