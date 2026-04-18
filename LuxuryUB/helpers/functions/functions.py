@@ -13,10 +13,10 @@ from ..utils.extdl import install_pip
 from ..utils.utils import runcmd
 
 try:
-    from imdb import IMDb
+    from imdb import Cinemagoer
 except ModuleNotFoundError:
-    install_pip("IMDbPY")
-    from imdb import IMDb
+    install_pip("cinemagoer")
+    from imdb import Cinemagoer
 
 from PIL import Image, ImageColor, ImageDraw, ImageFont, ImageOps
 from telethon.errors.rpcerrorlist import YouBlockedUserError
@@ -26,7 +26,8 @@ from ...Config import Config
 from ...sql_helper.globals import gvarstatus
 from ..resources.states import states
 
-imdb = IMDb()
+# استخدام الكلاس الحديث للمكتبة
+imdb = Cinemagoer()
 
 mov_titles = [
     "long imdb title",
@@ -36,7 +37,6 @@ mov_titles = [
     "canonical title",
     "localized title",
 ]
-
 # ----------------------------------------------## Scrap ##------------------------------------------------------------#
 
 
