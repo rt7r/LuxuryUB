@@ -12,26 +12,40 @@ from ..sql_helper.globals import gvarstatus, addgvar
 
 
 # ==================== الإعدادات المتطورة ====================
-# 🔓 إضافة worst (أسوأ صيغة) كخيار أخير حتى لا يرفض أي مقطع شورتس أو قديم
 YDL_AUDIO_OPTS = {
-    "format": "bestaudio/best", 
+    "format": "bestaudio[ext=m4a]/bestaudio/best",
+    "extractor_args": {
+        "youtube": {
+            "player_client": ["android", "ios", "web"]
+        }
+    },
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
     "geo_bypass": True,
     "nocheckcertificate": True,
+    "ignoreerrors": False,
+    "source_address": "0.0.0.0",
     "default_search": "ytsearch"
 }
 
 YDL_VIDEO_OPTS = {
-    "format": "bv*+ba/b",
+    "format": "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/best",
+    "merge_output_format": "mp4",
+    "extractor_args": {
+        "youtube": {
+            "player_client": ["android", "ios", "web"]
+        }
+    },
     "noplaylist": True,
     "quiet": True,
     "no_warnings": True,
     "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
     "geo_bypass": True,
     "nocheckcertificate": True,
+    "ignoreerrors": False,
+    "source_address": "0.0.0.0",
     "default_search": "ytsearch"
 }
 # ==================== الذاكرة المؤقتة (Smart Tracking) ====================
