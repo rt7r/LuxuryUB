@@ -10,13 +10,29 @@ from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 from ..sql_helper.globals import gvarstatus, addgvar
 
+cookie_path = "cookies.txt"
+has_cookies = os.path.exists(cookie_path)
 
-# ==================== الإعدادات المتطورة ====================
+if has_cookies:
+    attack_clients = ["web", "mweb", "tv_embedded", "android_vr", "ios", "android"]
+else:
+    attack_clients = ["tv_embedded", "android_vr", "mweb", "ios", "android"]
+
+os.environ["PATH"] += os.pathsep + os.path.abspath(".")
+
 YDL_AUDIO_OPTS = {
+    "extractor_args": {"youtube": {"player_client": attack_clients}},
+    "cookiefile": cookie_path if has_cookies else None,
+    "javascript_engine": "deno",
+    
+    "concurrent_fragment_downloads": 7,
+    "http_chunk_size": 10485760,
+    "socket_timeout": 15,
+    
     "format": "bestaudio[ext=m4a]/bestaudio/best",
     "noplaylist": True,
     "quiet": True,
-    "no_warnings": True,
+    "no_warnings": True, 
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": False,
@@ -25,7 +41,15 @@ YDL_AUDIO_OPTS = {
 }
 
 YDL_VIDEO_OPTS = {
-    "format": "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best",
+    "extractor_args": {"youtube": {"player_client": attack_clients}},
+    "cookiefile": cookie_path if has_cookies else None,
+    "javascript_engine": "deno",
+    
+    "concurrent_fragment_downloads": 7,
+    "http_chunk_size": 10485760,
+    "socket_timeout": 15,
+    
+    "format": "best[height<=720]/best", 
     "merge_output_format": "mp4",
     "noplaylist": True,
     "quiet": True,
@@ -36,7 +60,6 @@ YDL_VIDEO_OPTS = {
     "source_address": "0.0.0.0",
     "default_search": "ytsearch"
 }
-# ==================== الذاكرة المؤقتة (Smart Tracking) ====================
 active_calls = {} 
 is_playing = {} 
 playlist = {} 
@@ -224,7 +247,16 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
                     else: await call.start_audio(url_or_path, repeat=False)
                     is_playing[chat_id] = True
                 except Exception as e: return await proc.edit(f"**⚠️ فشل البث المباشر:** `{str(e)}`")
+                
+                if url_or_path and os.path.exists(url_or_path):
+                    if not str(url_or_path).startswith("http"):
+                        try:
+                            os.remove(url_or_path)
+                        except:
+                            pass
+                
                 return await proc.edit(f"**🎶 يتم الآن تشغيل:**\n`{title}`\n**نوع البث:** `{'فيديو 🎬' if is_video else 'صوت 🎵'}`")
+                
 
         except Exception as e:
             if "Sign in to confirm" in str(e):
