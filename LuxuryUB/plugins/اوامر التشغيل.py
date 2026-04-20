@@ -22,14 +22,20 @@ JOKRDEV = [1165225957]
     command=("اعادة تشغيل", plugin_category),
     info={
         "header": "لإعادة تشغيل البوت في الاستضافة (VPS)",
-        "usage": [
-            "{tr}اعادة تشغيل",
-        ],
+        "usage": ["{tr}اعادة تشغيل"],
     },
 )
 async def Hussein(event):
-    cat = await edit_or_reply(event, "** ᯽︙ انتظر قليلاً, جارِ اعادة التشغيل...**")
-    # تم إزالة كود الـ Git لمنع مسح تعديلاتك الخاصة بالاستضافة
+    cat = await edit_or_reply(event, "** ᯽︙ انتظر قليلاً، جارِ إعادة التشغيل...**")
+    
+    try:
+        from ..sql_helper.global_collection import add_item_collectionlist
+        from ..sql_helper.globals import addgvar
+        add_item_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, cat.id])
+        addgvar(Config.OWNER_ID, "restartupdate", "true")
+    except Exception as e:
+        LOGS.error(f"Error saving restart state: {e}")
+
     await event.client.reload(cat)
 
 @luxur.ar_cmd(

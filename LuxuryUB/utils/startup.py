@@ -67,8 +67,29 @@ async def setup_bot():
         await web.TCPSite(app, bind_address, luxuryport).start()
         luxur.me = await luxur.get_me()
         luxur.uid = luxur.tgbot.uid = utils.get_peer_id(luxur.me)
+        
         if Config.OWNER_ID == 0:
             Config.OWNER_ID = utils.get_peer_id(luxur.me)
+            
+        try:
+            import LuxuryUB
+            
+            # 1. سحب آيبي كروب التخزين (للخاص والتاكات)
+            pm_db_id = gvarstatus(Config.OWNER_ID, "PM_LOGGER_GROUP_ID")
+            if pm_db_id:
+                Config.PM_LOGGER_GROUP_ID = int(pm_db_id)
+                LuxuryUB.PM_LOGGER_GROUP_ID = int(pm_db_id)
+                
+            # 2. سحب آيبي كروب الإشعارات
+            botlog_db_id = gvarstatus(Config.OWNER_ID, "PRIVATE_GROUP_BOT_API_ID")
+            if botlog_db_id:
+                LuxuryUB.BOTLOG_CHATID = int(botlog_db_id)
+                LuxuryUB.BOTLOG = True
+                
+        except Exception as e:
+            LOGS.error(f"⚠️ خطأ في سحب الآيبيات من قاعدة البيانات: {e}")
+        # 🌟 --- نهاية التعديل --- 🌟
+
     except Exception as e:
         LOGS.error(f"كـود تيرمكس - {str(e)}")
         sys.exit()

@@ -20,45 +20,58 @@ else:
 
 os.environ["PATH"] += os.pathsep + os.path.abspath(".")
 
+cookie_path = "cookies.txt"
+has_cookies = os.path.exists(cookie_path)
+
+if has_cookies:
+    attack_clients = ["web", "mweb", "tv_embedded", "android_vr", "ios", "android"]
+    auth_opts = {
+        "cookiefile": cookie_path
+    }
+    is_quiet = True 
+else:
+    attack_clients = ["tv_embedded", "android_vr", "mweb", "ios", "android"]
+    auth_opts = {
+        "username": "oauth2",
+        "cachedir": "./yt_cache"
+    }
+    is_quiet = False 
+
 YDL_AUDIO_OPTS = {
     "extractor_args": {"youtube": {"player_client": attack_clients}},
-    "cookiefile": cookie_path if has_cookies else None,
     "javascript_engine": "deno",
-    
     "concurrent_fragment_downloads": 7,
     "http_chunk_size": 10485760,
     "socket_timeout": 15,
-    
     "format": "bestaudio[ext=m4a]/bestaudio/best",
     "noplaylist": True,
-    "quiet": True,
+    "quiet": is_quiet, 
     "no_warnings": True, 
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": False,
     "source_address": "0.0.0.0",
-    "default_search": "ytsearch"
+    "default_search": "ytsearch",
+    **auth_opts 
 }
 
 YDL_VIDEO_OPTS = {
     "extractor_args": {"youtube": {"player_client": attack_clients}},
-    "cookiefile": cookie_path if has_cookies else None,
     "javascript_engine": "deno",
-    
     "concurrent_fragment_downloads": 7,
     "http_chunk_size": 10485760,
     "socket_timeout": 15,
-    
-    "format": "best[height<=720]/best", 
+    "format": "best[height<=480]/best", 
     "merge_output_format": "mp4",
     "noplaylist": True,
-    "quiet": True,
+    "quiet": is_quiet, 
     "no_warnings": True,
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": False,
     "source_address": "0.0.0.0",
-    "default_search": "ytsearch"
+    "default_search": "ytsearch",
+    **auth_opts 
 }
 active_calls = {} 
 is_playing = {} 
@@ -100,8 +113,28 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
     if not is_music_enabled(owner_id): return await event.reply("**⚠️ نظام الميوزك معطل حالياً.**")
 
     chat_id = int(target_id_str) if target_id_str else event.chat_id
+    
     if owner_id not in active_calls:
         active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
+        call_obj = active_calls[owner_id]
+        
+        @call_obj.on_playout_ended
+        async def auto_play_handler(vc, cid, *args):
+            if cid in playlist and len(playlist[cid]) > 0:
+                next_item = playlist[cid].pop(0)
+                try:
+                    if next_item["is_video"]:
+                        await vc.start_video(next_item["url"], repeat=False)
+                    else:
+                        await vc.start_audio(next_item["url"], repeat=False)
+                    
+                    is_playing[cid] = True
+                    await event.client.send_message(cid, f"**⏭️ التشغيل التلقائي:**\nيتم الآن بث `{next_item['title']}` 💎")
+                except Exception as e:
+                    await event.client.send_message(cid, f"**⚠️ تم تخطي المقطع بسبب خطأ:** `{str(e)}`")
+            else:
+                is_playing[cid] = False
+
     call = active_calls[owner_id]
     
     if cmd in ["افتح مكالمة"]:
@@ -142,17 +175,19 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
             return await event.reply("**⏹️ تم مغادرة المكالمة.**")
         except: return await event.reply("**⚠️ الحساب ليس في المكالمة.**")
 
-    if cmd in ["اوكف", "وكف", "وقف"]:
+if cmd in ["اوكف", "وكف", "وقف"]:
         try:
-            await call.pause_playout() 
+            await call.pause() 
             return await event.reply("**⏸️ تم إيقاف التشغيل مؤقتاً.**")
-        except Exception as e: return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
-        
+        except Exception as e: 
+            return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
+            
     if cmd in ["كمل", "استمرار"]:
         try:
-            await call.resume_playout() 
+            await call.resume() 
             return await event.reply("**▶️ تم استئناف التشغيل.**")
-        except Exception as e: return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
+        except Exception as e: 
+            return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
         
     if cmd in ["ايقاف نهائي", "ايقاف"]:
         try:
@@ -298,3 +333,25 @@ async def operator_listener(event):
         if cmd in ["مغادرة", "ايقاف نهائي", "اطفاء مكالمة"]:
             return await event.reply("**⚠️ عذراً، لا تمتلك صلاحية لهذا الأمر.**")
         await process_music_command(event, cmd, target_id_str, query, reply)
+
+
+@luxur.ar_cmd(pattern="تسمية(?:\s|$)([\s\S]*)")
+async def rename_chat(event):
+    # التأكد من كتابة اسم بعد الأمر
+    new_name = event.pattern_match.group(1).strip()
+    if not new_name:
+        return await edit_or_reply(event, "**⚠️ يرجى كتابة الاسم الجديد مع الأمر!\nمثال: `.تسمية كروبنا`**")
+    
+    # محاولة تغيير الاسم
+    try:
+        await event.client(functions.channels.EditTitleRequest(
+            channel=event.chat_id,
+            title=new_name
+        ))
+        await edit_or_reply(event, f"**✅ تم تغيير اسم المجموعة بنجاح إلى:** `{new_name}` 💎")
+    except Exception as e:
+        # إذا الحساب ما عنده صلاحية أدمن بالكروب
+        if "CHAT_ADMIN_REQUIRED" in str(e):
+            await edit_or_reply(event, "**❌ فشل التغيير: يجب أن تكون مشرفاً ولديك صلاحية تغيير معلومات المجموعة.**")
+        else:
+            await edit_or_reply(event, f"**⚠️ خطأ:** `{str(e)}`")

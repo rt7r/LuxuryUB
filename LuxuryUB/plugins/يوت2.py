@@ -7,14 +7,11 @@ from LuxuryUB import luxur
 from ..Config import Config
 from ..core.managers import edit_or_reply, edit_delete
 
-# --- الإعدادات والذاكرة المؤقتة ---
 YT_SEARCH_CACHE = {}  # {user_id: [نتائج_البحث]}
 COOKIE_PATH = "cookies.txt"
 
-# 🛡️ إذا عندك بروكسي خليه هنا، وإذا ماكو خليه فارغ ""
 MY_PROXY = "" 
 
-# إعدادات البحث (لجلب المعلومات بس)
 YDL_OPTIONS = {
     "format": "b/w", # أي صيغة المهم يجيب الداتا
     "quiet": True,
@@ -74,7 +71,6 @@ async def luxury_yt_search(event):
             caption = format_yt_caption(video)
             buttons = get_yt_buttons(0, video['id'], len(entries))
             
-            # الإرسال عبر البوت المساعد لضمان عمل الأزرار
             await event.client.tgbot.send_file(
                 event.chat_id, video.get('thumbnail', 'https://i.imgur.com/7A2n2P6.png'), caption=caption, buttons=buttons
             )
@@ -83,7 +79,6 @@ async def luxury_yt_search(event):
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ في البحث:** `{str(e)}`")
 
-# --- 2️⃣ معالج تقليب الصفحات (Assistant Bot Side) ---
 @luxur.tgbot.on(events.CallbackQuery(data=re.compile(b"yt_page_(\d+)")))
 async def on_yt_page_change(event):
     page_index = int(event.data_match.group(1).decode())
@@ -109,16 +104,40 @@ async def on_yt_download(event):
     video_id = event.data_match.group(2).decode()
     url = f"https://www.youtube.com/watch?v={video_id}"
     
-    await event.answer("💎 جاري التحميل... قد يستغرق بعض الوقت.", alert=False)
+    await event.answer("💎 جاري تجهيز الملف... قد يستغرق بعض الوقت.", alert=False)
     proc = await event.reply("**📥 جاري التحميل من سيرفرات يوتيوب...**")
     
-    # 🔓 إعدادات التحميل הפعلي (كسر قيود الصيغ)
+    # 🌟 ترسانة التخطي والسرعة
+    attack_clients = ["web", "mweb", "tv_embedded", "ios", "android", "android_vr"] if os.path.exists(COOKIE_PATH) else ["ios", "tv_embedded", "android_vr", "mweb", "android"]
+    
+    # تحديد الصيغة: صوت صافي (m4a) أو فيديو
+    format_type = "bestaudio[ext=m4a]/bestaudio/best" if dl_type == "a" else "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/best"
+
+    # 🌟 --- الخطة المزدوجة (Cookies vs OAuth2) --- 🌟
+    if os.path.exists(COOKIE_PATH):
+        # الخطة أ: استخدم الكوكيز
+        auth_opts = {
+            "cookiefile": COOKIE_PATH
+        }
+        is_quiet = True # نخفي الرسائل لأن الكوكيز موجود
+    else:
+        # الخطة ب: استخدم الشاشة الذكية (OAuth2)
+        auth_opts = {
+            "username": "oauth2",
+            "cachedir": "./yt_cache"
+        }
+        is_quiet = False # نظهر الرسائل بالكونسول حتى تشوف كود التفعيل WXYZ-1234
+
     download_opts = {
-        "format": "ba/b/wa/w" if dl_type == "a" else "b/w",
+        "format": format_type,
         "outtmpl": f"downloads/{video_id}.%(ext)s",
-        "cookiefile": COOKIE_PATH if os.path.exists(COOKIE_PATH) else None,
         "proxy": MY_PROXY if MY_PROXY else None,
-        "extractor_args": {"youtube": {"player_client": ["ios", "web"]}},
+        "extractor_args": {"youtube": {"player_client": attack_clients}},
+        "javascript_engine": "deno",
+        "concurrent_fragment_downloads": 7, 
+        "quiet": is_quiet, # 🌟 ذكاء اصطناعي للكونسول
+        "no_warnings": True,
+        **auth_opts # 🌟 دمج خطة تسجيل الدخول هنا
     }
 
     try:
@@ -142,3 +161,28 @@ async def on_yt_download(event):
 
     except Exception as e:
         await proc.edit(f"**❌ فشل التحميل:**\n`{str(e)}`")
+        if os.path.exists(f"downloads/{video_id}"):
+            try: os.remove(f"downloads/{video_id}")
+            except: pass
+
+
+# --- 4️⃣ معالج عرض القائمة (Assistant Bot Side) ---
+@luxur.tgbot.on(events.CallbackQuery(data=b"yt_list"))
+async def on_yt_list(event):
+    user_id = event.sender_id
+    
+    if user_id not in YT_SEARCH_CACHE:
+        return await event.answer("⚠️ انتهت الجلسة، ابحث من جديد.", alert=True)
+        
+    results = YT_SEARCH_CACHE[user_id]
+    text = "**📑 نتائج البحث الحالية:**\n\n"
+    
+    for idx, video in enumerate(results):
+        title = video.get("title", "بدون عنوان")
+        text += f"**{idx + 1}.** `{title}`\n"
+        
+    text += "\n**💎 سـورس لوكـجوري ✓**"
+    
+    # نعدل الرسالة لتظهر القائمة، مع زر للرجوع
+    buttons = [[Button.inline("🔙 رجوع", data="yt_page_0")]]
+    await event.edit(text, buttons=buttons)
