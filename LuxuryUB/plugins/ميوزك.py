@@ -14,7 +14,7 @@ cookie_path = "cookies.txt"
 has_cookies = os.path.exists(cookie_path)
 
 if has_cookies:
-    attack_clients = ["web", "mweb", "tv_embedded", "android_vr", "ios", "android"]
+    attack_clients = ["web", "mweb", "tv_embedded", "ios", "android", "android_vr"]
 else:
     attack_clients = ["tv_embedded", "android_vr", "mweb", "ios", "android"]
 
