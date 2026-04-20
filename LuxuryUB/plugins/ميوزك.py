@@ -104,7 +104,7 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
         active_calls[owner_id] = GroupCallFactory(event.client, MTProtoClientType.TELETHON).get_group_call()
     call = active_calls[owner_id]
     
-    if cmd in ["فتح مكالمة"]:
+    if cmd in ["افتح مكالمة"]:
         try:
             await event.client(functions.phone.CreateGroupCallRequest(peer=chat_id, random_id=random.randint(10000, 999999999)))
             return await event.reply(f"**✅ تم فتح المكالمة الصوتية.**")
