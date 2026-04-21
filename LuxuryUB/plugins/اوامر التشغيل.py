@@ -29,9 +29,9 @@ async def Hussein(event):
     cat = await edit_or_reply(event, "** ᯽︙ انتظر قليلاً، جارِ إعادة التشغيل...**")
     
     try:
-        from ..sql_helper.global_collection import add_item_collectionlist
+        from ..sql_helper.global_collection import add_to_collectionlist
         from ..sql_helper.globals import addgvar
-        add_item_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, cat.id])
+        add_to_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, cat.id])
         addgvar(Config.OWNER_ID, "restartupdate", "true")
     except Exception as e:
         LOGS.error(f"Error saving restart state: {e}")

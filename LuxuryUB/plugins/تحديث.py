@@ -153,9 +153,9 @@ async def upstream(event):
             
             # 🔥 نظام خزن الآيدي حتى يجاوبك بعد ما يشتغل
             try:
-                from ..sql_helper.global_collection import add_item_collectionlist
+                from ..sql_helper.global_collection import add_to_collectionlist
                 from ..sql_helper.globals import addgvar
-                add_item_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, event.id])
+                add_to_collectionlist(Config.OWNER_ID, "restart_update", [event.chat_id, event.id])
                 addgvar(Config.OWNER_ID, "restartupdate", "true")
             except Exception as e:
                 LOGS.error(f"Error saving update state: {e}")
