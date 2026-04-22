@@ -7,20 +7,19 @@ import zipfile
 def install_first_time():
     packages = [
         "telethon", "psycopg2-binary==2.9.9", "Pillow", "pydub",
-        "SQLAlchemy==1.4.46", "aiohttp==3.9.5", "ocrspace", "ShazamAPI", "selenium",
+        "SQLAlchemy==1.4.46", "aiohttp==3.9.5", "ocrspace", "ShazamAPI",
         "setuptools", "wheel", "cloudscraper", "speechrecognition", "colour",
-        "qrcode", "python-barcode", "jotquote", "glitch_this", "cryptg",
-        "cowpy", "beautifulsoup4", "cfscrape", "cryptography", "moviepy==1.0.3",
-        "pyquery", "tswift", "wikipedia", "fontTools", "emoji==1.7.0",
-        "geopy", "gitpython", "google-api-python-client", "google-auth-httplib2",
-        "google-auth-oauthlib", "gsearch", "gtts", "hachoir", "html-telegraph-poster",
+        "qrcode", "python-barcode", "glitch_this", "cryptg",
+        "beautifulsoup4", "cryptography", "moviepy==1.0.3",
+        "pyquery", "tswift", "wikipedia", "fontTools", "emoji==2.12.1",
+        "geopy", "gitpython", "gsearch", "gtts", "hachoir", "html-telegraph-poster",
         "humanize", "justwatch", "kwot", "lottie", "jikanpy", "lyricsgenius",
         "markdown", "motor", "patool", "prettytable", "psutil", "pyfiglet",
-        "PyGithub", "programmingquotes", "pygments", "pylast", "pymediainfo",
+        "programmingquotes", "pygments", "pylast", "pymediainfo",
         "pySmartDL", "pytuneteller", "pytz", "wget", "urlextract", "search-engine-parser",
         "spamwatch", "speedtest-cli", "sqlalchemy-json", "telegraph", "tgcrypto",
-        "validators", "vcsi", "ipaddress", "wand", "ujson==5.8.0", "randomstuff.py",
-        "git+https://github.com/redaiq90/py-googletrans", "yt-dlp[default]", "youtube-search-python", 
+        "validators", "vcsi", "ipaddress", "ujson==5.8.0", "randomstuff.py",
+        "git+https://github.com/redaiq90/py-googletrans", "youtube-search-python", 
         "pytgcalls==3.0.0.dev24", "av==12.3.0"
     ]
  
@@ -32,7 +31,7 @@ def install_first_time():
     os.environ["TEMP"] = tmp_dir
     os.environ["TMP"] = tmp_dir
     
-    batch_size = 25
+    batch_size = 22
     total_batches = (len(packages) // batch_size) + 1
 
     for i in range(0, len(packages), batch_size):

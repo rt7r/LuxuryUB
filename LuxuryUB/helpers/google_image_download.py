@@ -29,9 +29,7 @@ from http.client import BadStatusLine
 from urllib.parse import quote
 from urllib.request import HTTPError, Request, URLError, urlopen
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+
 
 http.client._MAXHEADERS = 1000
 args_list = [
@@ -530,89 +528,12 @@ class googleimagesdownload:
             print(e)
             sys.exit()
 
-    # Download Page for more than 100 images
+# Download Page for more than 100 images
     def download_extended_page(self, url, chromedriver):
-        options = webdriver.ChromeOptions()
-        options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
+        print("⚠️ تم تعطيل Selenium لتوفير مساحة الاستضافة. سيتم جلب أول 100 صورة فقط.")
+        return self.download_page(url)
 
-        try:
-            browser = webdriver.Chrome(chromedriver, chrome_options=options)
-        except Exception as e:
-            print(
-                "Looks like we cannot locate the path the 'chromedriver' (use the '--chromedriver' "
-                "argument to specify the path to the executable.) or google chrome browser is not "
-                "installed on your machine (exception: %s)" % e
-            )
-            sys.exit()
-        browser.set_window_size(1024, 768)
-
-        # Open the link
-        browser.get(url)
-        browser.execute_script(
-            """
-            (function(XHR){
-                "use strict";
-                var open = XHR.prototype.open;
-                var send = XHR.prototype.send;
-                var data = [];
-                XHR.prototype.open = function(method, url, async, user, pass) {
-                    this._url = url;
-                    open.call(this, method, url, async, user, pass);
-                }
-                XHR.prototype.send = function(data) {
-                    var self = this;
-                    var url = this._url;
-                    function stateChanged() {
-                        if (self.readyState == 4) {
-                            console.log("data available for: " + url)
-                            XHR.prototype._data.push(self.response);
-                        }
-                    }
-                    if (url.includes("/batchexecute?")) {
-                        this.addEventListener("readystatechange", stateChanged, false);
-                    }
-                    send.call(this, data);
-                };
-                XHR.prototype._data = [];
-            })(XMLHttpRequest);
-        """
-        )
-
-        time.sleep(1)
-        print("Getting you a lot of images. This may take a few moments...")
-
-        element = browser.find_element(By.TAG_NAME, "body")
-        # Scroll down
-        for _ in range(50):
-            element.send_keys(Keys.PAGE_DOWN)
-            time.sleep(0.3)
-
-        try:
-            browser.find_element_by_xpath('//input[@value="Show more results"]').click()
-            for _ in range(50):
-                element.send_keys(Keys.PAGE_DOWN)
-                time.sleep(0.3)  # bot id protection
-        except Exception:
-            for _ in range(10):
-                element.send_keys(Keys.PAGE_DOWN)
-                time.sleep(0.3)  # bot id protection
-
-        print("Reached end of Page.")
-        time.sleep(0.5)
-
-        source = browser.page_source  # page source
-        images = self._image_objects_from_pack(self._extract_data_pack_extended(source))
-
-        ajax_data = browser.execute_script("return XMLHttpRequest.prototype._data")
-        for chunk in ajax_data:
-            images += self._image_objects_from_pack(self._extract_data_pack_ajax(chunk))
-
-        # close the browser
-        browser.close()
-
-        return images, self.get_all_tabs(source)
-
+        
     # Correcting the escape characters for python2
     def replace_with_byte(self, match):
         return chr(int(match.group(0)[1:], 8))

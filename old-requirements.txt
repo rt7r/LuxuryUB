@@ -4,7 +4,6 @@ SQLAlchemy
 aiohttp==3.9.5
 ocrspace
 ShazamAPI
-selenium
 setuptools
 wheel
 cloudscraper
@@ -15,9 +14,7 @@ python-barcode
 jotquote
 glitch_this
 cryptg
-cowpy
 beautifulsoup4
-cfscrape
 cryptography
 moviepy
 pyquery
@@ -28,9 +25,6 @@ emoji==1.7.0
 fonttools
 geopy
 gitpython
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
 gsearch
 gtts
 hachoir
@@ -40,7 +34,7 @@ humanize
 justwatch
 kwot
 lottie
-covid
+
 jikanpy
 lyricsgenius
 markdown
@@ -50,7 +44,7 @@ Pillow
 prettytable
 psutil
 pyfiglet
-PyGithub
+
 programmingquotes
 pygments
 psycopg2
@@ -63,7 +57,6 @@ pytz
 wget
 urlextract
 search-engine-parser
-selenium
 spamwatch
 speedtest-cli
 sqlalchemy-json
