@@ -101,10 +101,13 @@ class LuxuryClient(TelegramClient):
                         return
                 
                 if groups_only and not check.is_group:
-                    await edit_delete(check, "`هذا الأمر مخصص للمجموعات فقط عزيزي.`", 10)
+                    if getattr(check, "out", False):
+                        await edit_delete(check, "`هذا الأمر مخصص للمجموعات فقط عزيزي.`", 10)
                     return
+                    
                 if private_only and not check.is_private:
-                    await edit_delete(check, "`هذا الأمر مخصص للخاص فقط عزيزي.`", 10)
+                    if getattr(check, "out", False):
+                        await edit_delete(check, "`هذا الأمر مخصص للخاص فقط عزيزي.`", 10)
                     return
 
                 try:
