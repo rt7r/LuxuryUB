@@ -25,52 +25,85 @@ class LOG_CHATS:
 
 LOG_CHATS_ = LOG_CHATS()
 
+# 🌟 ذاكرة مؤقتة لكشف التعديلات الوهمية
+PM_TEXT_CACHE = {}
+
 @luxur.ar_cmd(incoming=True, func=lambda e: e.is_private, edited=True, forword=None)
-async def monito_p_m_s(event):  # sourcery no-metrics
-    if Config.PM_LOGGER_GROUP_ID == -100:
+async def monito_p_m_s(event):  
+    # 🌟 سحب الآيبي من الداتابيس (لأن الكونفج بي مشاكل)
+    pm_db = gvarstatus(Config.OWNER_ID, "PM_LOGGER_GROUP_ID")
+    if not pm_db or int(pm_db) == -100:
         return
+    REAL_PM_LOGGER = int(pm_db)
+
     if gvarstatus(Config.OWNER_ID, "PMLOG") and gvarstatus(Config.OWNER_ID, "PMLOG") == "false":
         return
     
     sender = await event.get_sender()
-    if not sender.bot:
-        chat = await event.get_chat()
-        if not no_log_pms_sql.is_approved(chat.id) and chat.id != 777000:
-            if LOG_CHATS_.RECENT_USER != chat.id:
-                LOG_CHATS_.RECENT_USER = chat.id
-                
-                if LOG_CHATS_.NEWPM:
-                    new_text = LOG_CHATS_.NEWPM.text.replace(
-                        " **📮┊رسـاله جـديده**", f"{LOG_CHATS_.COUNT} **رسـائل**"
-                    )
-                    if LOG_CHATS_.COUNT > 1 and LOG_CHATS_.NEWPM.text != new_text:
-                        try:
-                            await LOG_CHATS_.NEWPM.edit(new_text)
-                        except MessageNotModifiedError:
-                            pass
-                    else:
-                        await event.client.send_message(
-                            Config.PM_LOGGER_GROUP_ID,
-                            new_text
-                        )
-                    LOG_CHATS_.COUNT = 0
-                
-                original_message = f"الرسالة الاصلية: {event.message.text}" if isinstance(event.message, Message) else "الرسالة الاصلية: N/A"
-                edited_message = f"الرسالة المعدلة: {event.message.text}"
-                
-                LOG_CHATS_.NEWPM = await event.client.send_message(
-                    Config.PM_LOGGER_GROUP_ID,
-                    f"**🛂┊المسـتخـدم :** {_format.mentionuser(sender.first_name , sender.id)} **- قام بـ إرسـال رسـالة جـديـده** \n**🎟┊الايـدي :** `{chat.id}`\n\n{original_message}\n\n{edited_message}",
-                )
-                
-            try:
-                if event.message:
-                    await event.client.forward_messages(
-                        Config.PM_LOGGER_GROUP_ID, event.message, silent=True
-                    )
-                LOG_CHATS_.COUNT += 1
-            except Exception as e:
-                LOGS.warn(str(e))
+    if not sender or sender.bot:
+        return
+
+    chat = await event.get_chat()
+    if no_log_pms_sql.is_approved(chat.id) or chat.id == 777000:
+        return
+
+    # 🌟 فحص التعديل الوهمي والحقيقي
+    chat_id = event.chat_id
+    msg_id = event.message.id
+    current_text = event.message.message or "" 
+    cache_key = f"{chat_id}_{msg_id}"
+    
+    is_edited_event = bool(event.edit_date)
+    
+    if is_edited_event:
+        old_text = PM_TEXT_CACHE.get(cache_key)
+        if old_text == current_text:
+            # ❌ تعديل وهمي (معاينة رابط أو تفاعل) -> نغلس ولا كأنما شفنا شي!
+            return
+        
+        # ✅ تعديل حقيقي
+        PM_TEXT_CACHE[cache_key] = current_text # تحديث الذاكرة بالنص الجديد
+        edit_notification = f"**🛂┊المسـتخـدم :** {_format.mentionuser(sender.first_name , sender.id)} **- قام بـ تعديل رسالته ✏️** \n**🎟┊الايـدي :** `{chat.id}`\n\n**الرسالة القديمة:**\n`{old_text or '(ميديا أو غير محفوظة)'}`\n\n**الرسالة الجديدة:**\n`{current_text}`"
+        
+        try:
+            await event.client.send_message(REAL_PM_LOGGER, edit_notification)
+        except Exception as e:
+            LOGS.warn(str(e))
+        return # نتوقف هنا حتى ما يحسبها رسالة جديدة
+
+    # ✅ رسالة جديدة
+    PM_TEXT_CACHE[cache_key] = current_text # حفظ النص بالذاكرة للمقارنة لاحقاً
+    # تنظيف الذاكرة حتى ما تثقل الاستضافة (نحتفظ بآخر 100 رسالة فقط)
+    if len(PM_TEXT_CACHE) > 100:
+        PM_TEXT_CACHE.pop(next(iter(PM_TEXT_CACHE))) 
+
+    # 🌟 كود التخزين الأصلي للرسائل الجديدة (يجمع الرسائل بدل ما يدوخك)
+    if LOG_CHATS_.RECENT_USER != chat.id:
+        LOG_CHATS_.RECENT_USER = chat.id
+        if LOG_CHATS_.NEWPM:
+            new_text = LOG_CHATS_.NEWPM.text.replace(
+                " **📮┊رسـاله جـديده**", f"{LOG_CHATS_.COUNT} **رسـائل**"
+            )
+            if LOG_CHATS_.COUNT > 1 and LOG_CHATS_.NEWPM.text != new_text:
+                try:
+                    await LOG_CHATS_.NEWPM.edit(new_text)
+                except MessageNotModifiedError:
+                    pass
+            else:
+                await event.client.send_message(REAL_PM_LOGGER, new_text)
+            LOG_CHATS_.COUNT = 0
+        
+        LOG_CHATS_.NEWPM = await event.client.send_message(
+            REAL_PM_LOGGER,
+            f"**🛂┊المسـتخـدم :** {_format.mentionuser(sender.first_name , sender.id)} **- قام بـ إرسـال رسـالة جـديـده 📩** \n**🎟┊الايـدي :** `{chat.id}`",
+        )
+        
+    try:
+        if event.message:
+            await event.client.forward_messages(REAL_PM_LOGGER, event.message, silent=True)
+        LOG_CHATS_.COUNT += 1
+    except Exception as e:
+        LOGS.warn(str(e))
 
 @luxur.ar_cmd(incoming=True, func=lambda e: e.mentioned, edited=False, forword=None)
 async def log_tagged_messages(event):
@@ -263,18 +296,3 @@ async def set_grplog(event):
         await event.edit("**- تخزين الكـروبات بالفعـل معطـل ✓**")
 
 
-from LuxuryUB import luxur
-from ..Config import Config
-from ..sql_helper.globals import addgvar
-
-@luxur.ar_cmd(pattern="ربط التخزين$")
-async def link_storage(event):
-    chat_id = event.chat_id
-    addgvar(Config.OWNER_ID, "PM_LOGGER_GROUP_ID", str(chat_id))
-    await event.edit(f"**✅ تم ربط هذا الكروب كـ (مخزن رسائل) بنجاح!**\nالآيبي المربوط: `{chat_id}`\n**⚠️ سوي (.اعادة تشغيل) حتى يتفعل.**")
-
-@luxur.ar_cmd(pattern="ربط الاشعارات$")
-async def link_botlog(event):
-    chat_id = event.chat_id
-    addgvar(Config.OWNER_ID, "PRIVATE_GROUP_BOT_API_ID", str(chat_id))
-    await event.edit(f"**✅ تم ربط هذا الكروب كـ (إشعارات البوت) بنجاح!**\nالآيبي المربوط: `{chat_id}`\n**⚠️ سوي (.اعادة تشغيل) حتى يتفعل.**")

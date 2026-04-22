@@ -152,6 +152,18 @@ class LuxuryClient(TelegramClient):
                             self.add_event_handler(wrapper, MessageEdited(pattern=REGEX_.regex2, from_users=sudo_users, **kwargs))
                         self.add_event_handler(wrapper, NewMessage(pattern=REGEX_.regex2, from_users=sudo_users, **kwargs))
             
+            else:
+                if file_test in LOADED_CMDS and wrapper in LOADED_CMDS.get(file_test, []):
+                    return None
+                if file_test not in LOADED_CMDS:
+                    LOADED_CMDS.update({file_test: [wrapper]})
+                else:
+                    LOADED_CMDS[file_test].append(wrapper)
+                    
+                if edited:
+                    self.add_event_handler(wrapper, MessageEdited(**kwargs))
+                self.add_event_handler(wrapper, NewMessage(**kwargs))
+
             return wrapper
         return decorator
 
