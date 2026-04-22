@@ -68,15 +68,13 @@ async def luxury_yt_search(event):
             entries = search_data['entries']
             YT_SEARCH_CACHE[user_id] = entries
             video = entries[0]
-            caption = format_yt_caption(video)
-            buttons = get_yt_buttons(0, video['id'], len(entries))
-            
             results = await event.client.inline_query(Config.TG_BOT_USERNAME, f"yt_search {query}")
-    if results:
-        await results[0].click(event.chat_id, reply_to=event.reply_to_msg_id, hide_via=False)
-        await proc.delete() 
-    else:
-        await proc.edit("**❌ لم يتم العثور على نتائج.**")
+            
+            if results:
+                await results[0].click(event.chat_id, reply_to=event.reply_to_msg_id, hide_via=False)
+                await proc.delete() 
+            else:
+                await proc.edit("**❌ لم يتم العثور على نتائج.**")
 
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ في البحث:** `{str(e)}`")
