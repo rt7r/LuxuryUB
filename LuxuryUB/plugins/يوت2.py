@@ -18,7 +18,7 @@ YDL_OPTIONS = {
     "cookiefile": COOKIE_PATH if os.path.exists(COOKIE_PATH) else None,
     "proxy": MY_PROXY if MY_PROXY else None,
     "default_search": "ytsearch",
-    "extractor_args": {"youtube": {"player_client": ["web", "mweb", "tv_embedded", "ios", "android", "android_vr"]}},
+    "extractor_args": {"youtube": {"player_client": ["web"]}},
 }
 
 # --- دوال مساعدة لترتيب الشكل ---
