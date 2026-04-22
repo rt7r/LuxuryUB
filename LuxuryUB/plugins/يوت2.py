@@ -18,7 +18,7 @@ YDL_OPTIONS = {
     "cookiefile": COOKIE_PATH if os.path.exists(COOKIE_PATH) else None,
     "proxy": MY_PROXY if MY_PROXY else None,
     "default_search": "ytsearch",
-    "extractor_args": {"youtube": {"player_client": ["ios", "web"]}},
+    "extractor_args": {"youtube": {"player_client": ["web", "mweb", "tv_embedded", "ios", "android", "android_vr"]}},
 }
 
 # --- دوال مساعدة لترتيب الشكل ---
@@ -71,10 +71,12 @@ async def luxury_yt_search(event):
             caption = format_yt_caption(video)
             buttons = get_yt_buttons(0, video['id'], len(entries))
             
-            await event.client.tgbot.send_file(
-                event.chat_id, video.get('thumbnail', 'https://i.imgur.com/7A2n2P6.png'), caption=caption, buttons=buttons
-            )
-            await proc.delete()
+            results = await event.client.inline_query(Config.TG_BOT_USERNAME, f"yt_search {query}")
+    if results:
+        await results[0].click(event.chat_id, reply_to=event.reply_to_msg_id, hide_via=False)
+        await proc.delete() 
+    else:
+        await proc.edit("**❌ لم يتم العثور على نتائج.**")
 
     except Exception as e:
         await proc.edit(f"**⚠️ خطأ في البحث:** `{str(e)}`")
@@ -95,7 +97,11 @@ async def on_yt_page_change(event):
     caption = format_yt_caption(video)
     buttons = get_yt_buttons(page_index, video['id'], len(results))
     
-    await event.edit(caption, file=video.get('thumbnail', 'https://i.imgur.com/7A2n2P6.png'), buttons=buttons)
+    await event.delete()
+    # نرجع نستخدم الإنلاين للتنقل بين الصفحات بشكل احترافي
+    results = await event.client.inline_query(Config.TG_BOT_USERNAME, f"yt_search {results[page_index]['title']}")
+    if results:
+        await results[0].click(event.chat_id, hide_via=False)
 
 # --- 3️⃣ معالج التحميل (Assistant Bot Side) ---
 @luxur.tgbot.on(events.CallbackQuery(data=re.compile(b"ytdl_(a|v)_(.*)")))
@@ -171,3 +177,22 @@ async def on_yt_list(event):
     # نعدل الرسالة لتظهر القائمة، مع زر للرجوع
     buttons = [[Button.inline("🔙 رجوع", data="yt_page_0")]]
     await event.edit(text, buttons=buttons)
+
+@luxur.tgbot.on(events.InlineQuery(pattern=r"yt_search (.*)"))
+async def assistant_inline_handler(event):
+    query = event.pattern_match.group(1)
+    # نستخدم المكتبة اللي إنت معرفها فوق (YoutubeDL)
+    with YoutubeDL(YDL_OPTIONS) as ydl:
+        search_data = ydl.extract_info(f"ytsearch10:{query}", download=False)
+        entries = search_data.get('entries', [])
+        YT_SEARCH_CACHE[event.sender_id] = entries
+        results = []
+        for idx, video in enumerate(entries):
+            results.append(
+                await event.builder.photo(
+                    file=video.get('thumbnail', 'https://i.imgur.com/7A2n2P6.png'),
+                    text=format_yt_caption(video),
+                    buttons=get_yt_buttons(idx, video['id'], len(entries))
+                )
+            )
+        await event.answer(results)

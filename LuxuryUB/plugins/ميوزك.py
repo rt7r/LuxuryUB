@@ -161,16 +161,16 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
             return await event.reply("**⏹️ تم مغادرة المكالمة.**")
         except: return await event.reply("**⚠️ الحساب ليس في المكالمة.**")
 
-    if cmd in ["اوكف", "وكف", "وقف"]:
+if cmd in ["اوكف", "وكف", "وقف"]:
         try:
-            await call.pause.stream() 
+            await call.pause_stream(event.chat_id) 
             return await event.reply("**⏸️ تم إيقاف التشغيل مؤقتاً.**")
         except Exception as e: 
             return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
             
     if cmd in ["كمل", "استمرار"]:
         try:
-            await call.resume.stream() 
+            await call.resume_stream(event.chat_id) 
             return await event.reply("**▶️ تم استئناف التشغيل.**")
         except Exception as e: 
             return await event.reply(f"**⚠️ خطأ:** `{str(e)}`")
