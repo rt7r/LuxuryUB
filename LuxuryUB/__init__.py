@@ -38,7 +38,7 @@ else:
     Config.BOTLOG = True
 
 if Config.PM_LOGGER_GROUP_ID == 0:
-    if gvarstatus(Config.OWNER_ID, "PRIVATE_GROUP_BOT_API_ID") is None:
+    if gvarstatus(Config.OWNER_ID, "PM_LOGGER_GROUP_ID") is None: # 🌟 تم تصحيح المتغير هنا
         Config.PM_LOGGER_GROUP_ID = -100
     else:
         Config.PM_LOGGER_GROUP_ID = int(gvarstatus(Config.OWNER_ID, "PM_LOGGER_GROUP_ID"))
