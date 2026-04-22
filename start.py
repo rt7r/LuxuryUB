@@ -31,7 +31,7 @@ def install_first_time():
     os.environ["TEMP"] = tmp_dir
     os.environ["TMP"] = tmp_dir
     
-    batch_size = 22
+    batch_size = 21
     total_batches = (len(packages) // batch_size) + 1
 
     for i in range(0, len(packages), batch_size):
