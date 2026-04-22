@@ -113,21 +113,6 @@ async def on_yt_download(event):
     # تحديد الصيغة: صوت صافي (m4a) أو فيديو
     format_type = "bestaudio[ext=m4a]/bestaudio/best" if dl_type == "a" else "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/best"
 
-    # 🌟 --- الخطة المزدوجة (Cookies vs OAuth2) --- 🌟
-    if os.path.exists(COOKIE_PATH):
-        # الخطة أ: استخدم الكوكيز
-        auth_opts = {
-            "cookiefile": COOKIE_PATH
-        }
-        is_quiet = True # نخفي الرسائل لأن الكوكيز موجود
-    else:
-        # الخطة ب: استخدم الشاشة الذكية (OAuth2)
-        auth_opts = {
-            "username": "oauth2",
-            "cachedir": "./yt_cache"
-        }
-        is_quiet = False # نظهر الرسائل بالكونسول حتى تشوف كود التفعيل WXYZ-1234
-
     download_opts = {
         "format": format_type,
         "outtmpl": f"downloads/{video_id}.%(ext)s",
@@ -135,9 +120,9 @@ async def on_yt_download(event):
         "extractor_args": {"youtube": {"player_client": attack_clients}},
         "javascript_engine": "deno",
         "concurrent_fragment_downloads": 7, 
-        "quiet": is_quiet, # 🌟 ذكاء اصطناعي للكونسول
+        "quiet": True, 
         "no_warnings": True,
-        **auth_opts # 🌟 دمج خطة تسجيل الدخول هنا
+        "cookiefile": COOKIE_PATH if os.path.exists(COOKIE_PATH) else None, 
     }
 
     try:

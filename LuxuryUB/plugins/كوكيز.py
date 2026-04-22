@@ -2,10 +2,16 @@ import os
 from LuxuryUB import luxur
 from telethon import events
 
-# تأكد إنك تستخدم اسم العميل مالتك (client أو bot حسب سورسك)
-@luxur.ar_cmd(events.NewMessage(pattern=r'\.تحديث الكوكيز', outgoing=True))
+@luxur.ar_cmd(
+    pattern="تحديث الكوكيز$",
+    command=("تحديث الكوكيز", "الميوزك"),
+    info={
+        "header": "لتحديث ملف الكوكيز الخاص باليوتيوب لتشغيل الاغاني",
+        "usage": "{tr}تحديث الكوكيز بالرد على ملف cookies.txt",
+    }
+)
+
 async def update_cookies(event):
-    # 1. يتأكد إنك رديت على رسالة
     if not event.reply_to_msg_id:
         return await event.edit("⚠️ لازم ترد على ملف `cookies.txt` الجديد!")
     

@@ -261,3 +261,20 @@ async def set_grplog(event):
         await event.edit("**- تـم تفعيـل تخـزين تاكـات الكـروبات .. بنجـاح✓**")
     else:
         await event.edit("**- تخزين الكـروبات بالفعـل معطـل ✓**")
+
+
+from LuxuryUB import luxur
+from ..Config import Config
+from ..sql_helper.globals import addgvar
+
+@luxur.ar_cmd(pattern="ربط التخزين$")
+async def link_storage(event):
+    chat_id = event.chat_id
+    addgvar(Config.OWNER_ID, "PM_LOGGER_GROUP_ID", str(chat_id))
+    await event.edit(f"**✅ تم ربط هذا الكروب كـ (مخزن رسائل) بنجاح!**\nالآيبي المربوط: `{chat_id}`\n**⚠️ سوي (.اعادة تشغيل) حتى يتفعل.**")
+
+@luxur.ar_cmd(pattern="ربط الاشعارات$")
+async def link_botlog(event):
+    chat_id = event.chat_id
+    addgvar(Config.OWNER_ID, "PRIVATE_GROUP_BOT_API_ID", str(chat_id))
+    await event.edit(f"**✅ تم ربط هذا الكروب كـ (إشعارات البوت) بنجاح!**\nالآيبي المربوط: `{chat_id}`\n**⚠️ سوي (.اعادة تشغيل) حتى يتفعل.**")

@@ -20,23 +20,8 @@ else:
 
 os.environ["PATH"] += os.pathsep + os.path.abspath(".")
 
-cookie_path = "cookies.txt"
-has_cookies = os.path.exists(cookie_path)
 
-if has_cookies:
-    attack_clients = ["web", "mweb", "tv_embedded", "android_vr", "ios", "android"]
-    auth_opts = {
-        "cookiefile": cookie_path
-    }
-    is_quiet = True 
-else:
-    attack_clients = ["tv_embedded", "android_vr", "mweb", "ios", "android"]
-    auth_opts = {
-        "username": "oauth2",
-        "cachedir": "./yt_cache"
-    }
-    is_quiet = False 
-
+# 🎵 إعدادات الصوت (مدمج وياها الكوكيز مباشرة)
 YDL_AUDIO_OPTS = {
     "extractor_args": {"youtube": {"player_client": attack_clients}},
     "javascript_engine": "deno",
@@ -45,16 +30,17 @@ YDL_AUDIO_OPTS = {
     "socket_timeout": 15,
     "format": "bestaudio[ext=m4a]/bestaudio/best",
     "noplaylist": True,
-    "quiet": is_quiet, 
+    "quiet": True, 
     "no_warnings": True, 
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": False,
     "source_address": "0.0.0.0",
     "default_search": "ytsearch",
-    **auth_opts 
+    "cookiefile": cookie_path if os.path.exists(cookie_path) else None, # 🌟 الاعتماد الكلي على الكوكيز
 }
 
+# 🎬 إعدادات الفيديو (مدمج وياها الكوكيز مباشرة)
 YDL_VIDEO_OPTS = {
     "extractor_args": {"youtube": {"player_client": attack_clients}},
     "javascript_engine": "deno",
@@ -64,14 +50,14 @@ YDL_VIDEO_OPTS = {
     "format": "best[height<=480]/best", 
     "merge_output_format": "mp4",
     "noplaylist": True,
-    "quiet": is_quiet, 
+    "quiet": True, 
     "no_warnings": True,
     "geo_bypass": True,
     "nocheckcertificate": True,
     "ignoreerrors": False,
     "source_address": "0.0.0.0",
     "default_search": "ytsearch",
-    **auth_opts 
+    "cookiefile": cookie_path if os.path.exists(cookie_path) else None, # 🌟 الاعتماد الكلي على الكوكيز
 }
 active_calls = {} 
 is_playing = {} 
