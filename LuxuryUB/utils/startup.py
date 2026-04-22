@@ -122,13 +122,7 @@ async def startupmessage():
             message = await luxur.get_messages(msg_details[0], ids=msg_details[1])
             text = message.text + "\n\n**تم تشغيل البوت الأن أرسل `.فحص`**"
             await luxur.edit_message(msg_details[0], msg_details[1], text)
-            if gvarstatus(Config.OWNER_ID, "restartupdate") is not None:
-                await luxur.send_message(
-                    msg_details[0],
-                    f"{cmdhr}بنك",
-                    reply_to=msg_details[1],
-                    schedule=timedelta(seconds=10),
-                )
+            
             try:
                 del_keyword_collectionlist(Config.OWNER_ID, "restart_update")
             except:
