@@ -491,102 +491,152 @@ async def _(event):
 
     await luxur.send_message(event.chat_id, "تم الانتهاء من التجميع")
     
-@luxur.ar_cmd(pattern="راتب(?:\s|$)([\s\S]*)")
-async def hussein(event):
-    global its_hussein
-    await event.delete()
-    if not its_hussein:
-        its_hussein = True
-        if event.is_group:
-            await send_reham(event)
-        else:
-            await event.edit("**هذا الأمر يمكن استخدامه فقط في المجموعات!**")
 
-async def send_reham(event):
-    await event.respond('راتب وعد')
-    await asyncio.sleep(660)
-    global its_hussein
-    if its_hussein:
-        await send_reham(event)  
-@luxur.ar_cmd(pattern="ايقاف راتب وعد(?:\s|$)([\s\S]*)")
-async def hussein(event):
-    global its_hussein
-    its_hussein = False
-    await event.edit("**تم تعطيل راتب وعد بنجاح ✅**")
-@luxur.ar_cmd(pattern="بخشيش وعد(?:\s|$)([\s\S]*)")
-async def hussein(event):
-    global its_joker
-    await event.delete()
-    if not its_joker:
-        its_joker = True
-        if event.is_group:
-            await send_aljoker(event)
-        else:
-            await event.edit("**هذا الأمر يمكن استخدامه فقط في المجموعات!**")
-async def send_aljoker(event):
-    await event.respond('بخشيش')
-    await asyncio.sleep(660)
-    global its_joker
-    if its_joker:
-        await send_aljoker(event)  
-@luxur.ar_cmd(pattern="ايقاف بخشيش وعد(?:\s|$)([\s\S]*)")
-async def hussein(event):
-    global its_joker
-    its_joker = False
-    await event.edit("**᯽︙ تم تعطيل بخشيش وعد بنجاح ✓ **")
-@luxur.ar_cmd(pattern="سرقة وعد(?:\s|$)([\s\S]*)")
-async def hussein(event):
-    global its_reda
-    await event.delete()
-    if not its_reda:
-        its_reda = True
-        if event.is_group:
-            message = event.pattern_match.group(1).strip()
-            if message:
-                await send_message(event, message)
-            else:
-                await event.edit("**يرجى كتابة ايدي الشخص مع الامر!**")
 
-async def send_message(event, message):
-    await event.respond(f"زرف {message}")
-    await asyncio.sleep(660)
-    global its_reda
-    if its_reda:
-        await send_message(event, message)
-
-@luxur.ar_cmd(pattern="ايقاف سرقة وعد(?:\s|$)([\s\S]*)")
-async def Reda(event):
-    global its_reda
-    its_reda = False
-    await event.edit("** ᯽︙ تم ايقاف السرقة بنجاح ✓ **")
-client = luxur
-
-@luxur.ar_cmd(pattern="استثمار وعد")
-async def w3d_joker(event):
-    await event.delete()
-    global its_Reham
-    its_Reham = True
-    while its_Reham:
-        if event.is_group:
-            await event.client.send_message(event.chat_id, "فلوسي")
-            await asyncio.sleep(3)
-            aljoker = await event.client.get_messages(event.chat_id, limit=1)
-            aljoker = aljoker[0].message
-            aljoker = ("".join(aljoker.split(maxsplit=4)[4:])).split(" ", 4)
-            luxur = aljoker[0]
-            if luxur.isdigit() and int(luxur) > 500000000:
-                await event.client.send_message(event.chat_id,f"استثمار {luxur}")
-                await asyncio.sleep(5)
-                joker = await event.client.get_messages(event.chat_id, limit=1)
-                await joker[0].click(text="اي ✅")
-            else:
-                await event.client.send_message(event.chat_id, f"استثمار {luxur}")
-            await asyncio.sleep(1220)
+async def resume_w3d_tasks():
+    await asyncio.sleep(10)
+    
+    if gvarstatus(None, "RATIB_W3D_STATUS") == "true":
+        chat_id = int(gvarstatus(None, "RATIB_W3D_CHAT"))
+        asyncio.create_task(send_ratib_loop(chat_id))
         
-        else:
-            await event.edit("** ᯽︙ امر الاستثمار يمكنك استعماله في المجموعات فقط 🖤**")
-@luxur.ar_cmd(pattern="ايقاف استثمار وعد")
-async def disable_w3d(event):
-    global its_Reham
-    its_Reham = False
+    if gvarstatus(None, "BAKH_W3D_STATUS") == "true":
+        chat_id = int(gvarstatus(None, "BAKH_W3D_CHAT"))
+        asyncio.create_task(send_bakh_loop(chat_id))
+
+    if gvarstatus(None, "ZRF_W3D_STATUS") == "true":
+        chat_id = int(gvarstatus(None, "ZRF_W3D_CHAT"))
+        target = gvarstatus(None, "ZRF_W3D_TARGET")
+        asyncio.create_task(send_zrf_loop(chat_id, target))
+
+    if gvarstatus(None, "INVEST_W3D_STATUS") == "true":
+        chat_id = int(gvarstatus(None, "INVEST_W3D_CHAT"))
+        asyncio.create_task(w3d_investment_loop(chat_id))
+
+asyncio.create_task(resume_w3d_tasks())
+
+
+async def send_ratib_loop(chat_id):
+    while gvarstatus(None, "RATIB_W3D_STATUS") == "true":
+        try:
+            await luxur.send_message(chat_id, 'راتب')
+        except: break
+        await asyncio.sleep(660)
+
+@luxur.ar_cmd(pattern="راتب وعد$")
+async def start_ratib(event):
+    if not event.is_group:
+        return await event.edit("**هذا الأمر يمكن استخدامه فقط في المجموعات!**")
+    if gvarstatus(None, "RATIB_W3D_STATUS") == "true":
+        return await event.edit("**راتب وعد مفعل بالفعل.**")
+    
+    addgvar(None, "RATIB_W3D_STATUS", "true")
+    addgvar(None, "RATIB_W3D_CHAT", str(event.chat_id))
+    await event.delete()
+    asyncio.create_task(send_ratib_loop(event.chat_id))
+
+@luxur.ar_cmd(pattern="ايقاف راتب وعد$")
+async def stop_ratib(event):
+    delgvar(None, "RATIB_W3D_STATUS")
+    delgvar(None, "RATIB_W3D_CHAT")
+    await event.edit("**تم تعطيل راتب وعد بنجاح ✅**")
+
+
+async def send_bakh_loop(chat_id):
+    while gvarstatus(None, "BAKH_W3D_STATUS") == "true":
+        try:
+            await luxur.send_message(chat_id, 'بخشيش')
+        except: break
+        await asyncio.sleep(660)
+
+@luxur.ar_cmd(pattern="بخشيش وعد$")
+async def start_bakh(event):
+    if not event.is_group:
+        return await event.edit("**هذا الأمر يمكن استخدامه فقط في المجموعات!**")
+    if gvarstatus(None, "BAKH_W3D_STATUS") == "true":
+        return await event.edit("**بخشيش وعد مفعل بالفعل.**")
+    
+    addgvar(None, "BAKH_W3D_STATUS", "true")
+    addgvar(None, "BAKH_W3D_CHAT", str(event.chat_id))
+    await event.delete()
+    asyncio.create_task(send_bakh_loop(event.chat_id))
+
+@luxur.ar_cmd(pattern="ايقاف بخشيش وعد$")
+async def stop_bakh(event):
+    delgvar(None, "BAKH_W3D_STATUS")
+    delgvar(None, "BAKH_W3D_CHAT")
+    await event.edit("**᯽︙ تم تعطيل بخشيش وعد بنجاح ✓ **")
+
+async def send_zrf_loop(chat_id, target):
+    while gvarstatus(None, "ZRF_W3D_STATUS") == "true":
+        try:
+            await luxur.send_message(chat_id, f"زرف {target}")
+        except: break
+        await asyncio.sleep(660)
+
+@luxur.ar_cmd(pattern="سرقة وعد(?:\s|$)([\s\S]*)")
+async def start_zrf(event):
+    if not event.is_group:
+        return await event.edit("**هذا الأمر يمكن استخدامه فقط في المجموعات!**")
+        
+    target = event.pattern_match.group(1).strip()
+    if not target:
+        return await event.edit("**يرجى كتابة ايدي الشخص مع الامر!**")
+        
+    if gvarstatus(None, "ZRF_W3D_STATUS") == "true":
+        return await event.edit("**عملية السرقة مفعلة بالفعل، قم بايقافها أولاً لتغيير الهدف.**")
+    
+    addgvar(None, "ZRF_W3D_STATUS", "true")
+    addgvar(None, "ZRF_W3D_CHAT", str(event.chat_id))
+    addgvar(None, "ZRF_W3D_TARGET", target) # نحفظ الهدف حتى ما ينساه السورس
+    await event.delete()
+    asyncio.create_task(send_zrf_loop(event.chat_id, target))
+
+@luxur.ar_cmd(pattern="ايقاف سرقة وعد$")
+async def stop_zrf(event):
+    delgvar(None, "ZRF_W3D_STATUS")
+    delgvar(None, "ZRF_W3D_CHAT")
+    delgvar(None, "ZRF_W3D_TARGET")
+    await event.edit("** ᯽︙ تم ايقاف السرقة بنجاح ✓ **")
+
+async def w3d_investment_loop(chat_id):
+    while gvarstatus(None, "INVEST_W3D_STATUS") == "true":
+        try:
+            await luxur.send_message(chat_id, "فلوسي")
+            await asyncio.sleep(3)
+            messages = await luxur.get_messages(chat_id, limit=1)
+            if messages:
+                msg_text = messages[0].message
+                parts = msg_text.split()
+                # استخراج الرقم لضمان عدم حدوث خطأ
+                luxur_amount = next((s for s in parts if s.isdigit()), "0")
+                
+                if int(luxur_amount) > 500000000:
+                    await luxur.send_message(chat_id, f"استثمار {luxur_amount}")
+                    await asyncio.sleep(5)
+                    joker_msgs = await luxur.get_messages(chat_id, limit=1)
+                    await joker_msgs[0].click(text="اي ✅")
+                else:
+                    await luxur.send_message(chat_id, f"استثمار {luxur_amount}")
+        except: break
+        await asyncio.sleep(1220)
+
+@luxur.ar_cmd(pattern="استثمار وعد$")
+async def start_invest(event):
+    if not event.is_group:
+        return await event.edit("** ᯽︙ امر الاستثمار يمكنك استعماله في المجموعات فقط 🖤**")
+    
+    if gvarstatus(None, "INVEST_W3D_STATUS") == "true":
+        return await event.edit("**الاستثمار مفعل بالفعل.**")
+        
+    addgvar(None, "INVEST_W3D_STATUS", "true")
+    addgvar(None, "INVEST_W3D_CHAT", str(event.chat_id))
+    await event.delete()
+    asyncio.create_task(w3d_investment_loop(event.chat_id))
+
+@luxur.ar_cmd(pattern="ايقاف استثمار وعد$")
+async def stop_invest(event):
+    delgvar(None, "INVEST_W3D_STATUS")
+    delgvar(None, "INVEST_W3D_CHAT")
     await event.edit("**تم تعطيل عملية الاستثمار وعد.**")
+
