@@ -102,7 +102,7 @@ async def dl_youtube_search(event):
 
 # =========================================================
 
-@luxur.ar_cmd(pattern="(تحميل ص|صوت|فيديو)(?:\s|$)([\s\S]*)")
+@luxur.ar_cmd(pattern="(تحميل ص|صوت)(?:\s|$)([\s\S]*)")
 async def dl_local_direct(event):
     cmd = event.pattern_match.group(1)
     query = event.pattern_match.group(2).strip()
@@ -110,7 +110,7 @@ async def dl_local_direct(event):
     
     # يوتيوب يمر عبر البوت الخارجي
     if "youtube.com" in query or "youtu.be" in query:
-        if cmd == "فيديو":
+        if cmd == "ف":
             msg = await edit_or_reply(event, "**᯽︙ جـارِ جلب الفيديو من يوتيوب... 📥**")
             media = await fetch_video_only(event.client, "@GoldnB7Rbot", f"فيديو {query}")
         else:
