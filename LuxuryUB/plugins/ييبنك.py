@@ -21,18 +21,13 @@ from ..sql_helper.globals import gvarstatus
 
 plugin_category = "utils"
 
-#كتـابة وتعـديل:  @lMl10l
 
-# =======================================================
-# --- دالة جلب البيانات من JSON (للتنصيب الداخلي) ---
-# =======================================================
 def get_db(client_id):
     db_path = f"vars_{client_id}.json"
     if not os.path.exists(db_path): 
         return {}
     with open(db_path, "r", encoding="utf-8") as f: 
         return json.load(f)
-# =======================================================
 
 @luxur.ar_cmd(pattern="بنك(?:\s|$)([\s\S]*)")
 async def jokerping(event):
@@ -45,17 +40,14 @@ async def jokerping(event):
     end = datetime.now()
     ms = (end - start).microseconds / 1000
     
-    # الجلب من JSON أولاً، ثم SQL كاحتياط، ثم القيمة الافتراضية
     EMOJI = db.get("ALIVE_EMOJI") or gvarstatus(Config.OWNER_ID, "ALIVE_EMOJI") or "✇ ◅"
     PING_TEXT = db.get("PING_TEXT") or gvarstatus(Config.OWNER_ID, "PING_TEXT") or "**[ 𝗜 𝗝𝘂𝘀𝘁 𝗔𝘀𝗸𝗲𝗱 𝗙𝗼𝗿 𝗦𝗼𝗺𝗲 𝗣𝗲𝗮𝗰𝗲  ](t.me/mn_qv)**"
     PING_IMG = db.get("PING_PIC") or gvarstatus(Config.OWNER_ID, "PING_PIC") or "https://files.catbox.moe/r74kqv.jpg"
     HuRe_caption = db.get("PING_TEMPLATE") or gvarstatus(Config.OWNER_ID, "PING_TEMPLATE") or temp
     
-    # === سحب اسمك الحقيقي وعمل منشن قابل للضغط ===
     me = await event.client.get_me()
     first_name = me.first_name or "المطور"
     mention = f"[{first_name}](tg://user?id={me.id})"
-    # ========================================================
     
     caption = HuRe_caption.format(
         PING_TEXT=PING_TEXT,

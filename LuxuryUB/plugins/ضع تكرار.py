@@ -1,8 +1,6 @@
 import asyncio
-
 from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.types import ChatBannedRights
-
 from ..sql_helper import antiflood_sql as sql
 from ..utils import is_admin
 from . import luxur, edit_or_reply
@@ -81,5 +79,4 @@ async def _(event):
         await event.edit(f"تم تحديث عدد الـتكرار لـ {input_str} في الدردشه الحالية")
     except Exception as e:
         await event.edit(str(e))
-# For Catuserbot
-# Arabic Translate By  :  @lMl10l
+

@@ -1,7 +1,5 @@
 import asyncio
-
 from LuxuryUB import luxur
-
 from ..core.managers import edit_or_reply
 
 plugin_category = "fun"

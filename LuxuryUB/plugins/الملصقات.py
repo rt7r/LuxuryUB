@@ -1,8 +1,4 @@
-#Fixes by Reda 
-#Made by hussein
-#-------------
 import asyncio
-import base64
 import io
 import math
 import os
@@ -273,7 +269,7 @@ async def add_to_pack(
         "usage": "{tr}kang [emoji('s)] [number]",
     },
 )
-async def kang(args):  # sourcery no-metrics
+async def kang(args):  
     "To kang a sticker."
     photo = None
     emojibypass = False
@@ -361,10 +357,10 @@ async def kang(args):  # sourcery no-metrics
             if char_is_emoji(splat[0][0]):
                 if char_is_emoji(splat[1][0]):
                     return await catevent.edit("check `.info stickers`")
-                pack = splat[1]  # User sent both
+                pack = splat[1]  
                 emoji = splat[0]
             elif char_is_emoji(splat[1][0]):
-                pack = splat[0]  # User sent both
+                pack = splat[0]  
                 emoji = splat[1]
             else:
                 return await catevent.edit("check `.info stickers`")

@@ -1,18 +1,10 @@
-"""Check your internet speed powered by speedtest.net
-Syntax: .speedtest
-Available Options: image, file, text"""
-
 from time import time
-
 import speedtest
-
 from LuxuryUB import luxur
-
 from ..core.managers import edit_or_reply
 from ..helpers.utils import reply_id
 
 plugin_category = "utils"
-
 
 def convert_from_bytes(size):
     power = 2 ** 10

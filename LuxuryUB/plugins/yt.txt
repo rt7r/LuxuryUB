@@ -1,0 +1,526 @@
+import os
+import re
+import time
+import asyncio
+import secrets
+from yt_dlp import YoutubeDL
+from telethon import events, Button
+from telethon.tl.types import DocumentAttributeAudio, InputWebDocument
+from LuxuryUB import luxur
+from ..Config import Config
+from ..core.managers import edit_or_reply, edit_delete
+
+
+COOKIE_PATH = "cookies.txt"
+HAS_COOKIES = os.path.exists(COOKIE_PATH)
+
+DL_DIR = os.path.abspath(".luxury_yt_dl")
+os.makedirs(DL_DIR, exist_ok=True)
+
+MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024
+CACHE_TTL = 1800
+PREFETCH_CONCURRENCY = 4
+
+SEARCH_CACHE = {}
+READY_CACHE = {}
+ENRICH_LOCKS = {}
+
+ATTACK_CLIENTS = ["web"] if HAS_COOKIES else ["tv_embedded", "ios"]
+os.environ["PATH"] += os.pathsep + os.path.abspath(".")
+_BOT_USERNAME_CACHE = {"value": None}
+
+
+SEARCH_OPTS = {
+    "quiet": True,
+    "no_warnings": True,
+    "extract_flat": "in_playlist",
+    "skip_download": True,
+    "noplaylist": True,
+    "default_search": "ytsearch",
+    "socket_timeout": 8,
+    "cookiefile": COOKIE_PATH if HAS_COOKIES else None,
+}
+_search_ydl = YoutubeDL({k: v for k, v in SEARCH_OPTS.items() if v is not None})
+
+INFO_OPTS = {
+    "quiet": True,
+    "no_warnings": True,
+    "skip_download": True,
+    "noplaylist": True,
+    "socket_timeout": 8,
+    "extractor_args": {"youtube": {"player_client": ATTACK_CLIENTS}},
+    "cookiefile": COOKIE_PATH if HAS_COOKIES else None,
+}
+_info_ydl = YoutubeDL({k: v for k, v in INFO_OPTS.items() if v is not None})
+
+
+def _safe_str(s):
+    if not s:
+        return ""
+    s = str(s)
+    for ch in ("*", "`", "_", "[", "]"):
+        s = s.replace(ch, " ")
+    return s
+
+
+def _fmt_views(n):
+    if not n:
+        return "0"
+    if n >= 1_000_000_000:
+        return f"{n/1_000_000_000:.1f}B"
+    if n >= 1_000_000:
+        return f"{n/1_000_000:.0f}M"
+    if n >= 1_000:
+        return f"{n/1_000:.1f}K"
+    return str(n)
+
+
+def _fmt_duration(secs):
+    if not secs:
+        return "غير معروف"
+    s = int(secs)
+    h, rem = divmod(s, 3600)
+    m, s = divmod(rem, 60)
+    if h:
+        return f"{h} hours, {m} minutes, {s} seconds"
+    if m:
+        return f"{m} minutes, {s} seconds"
+    return f"{s} seconds"
+
+
+def _fmt_upload_date(upload_date):
+    s = str(upload_date or "")
+    if len(s) == 8 and s.isdigit():
+        return f"{s[:4]}/{s[4:6]}/{s[6:8]}"
+    return "غير معروف"
+
+
+def _thumb_url(video):
+    vid = video.get("id")
+    if vid:
+        return f"https://img.youtube.com/vi/{vid}/mqdefault.jpg"
+    return video.get("thumbnail") or "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg"
+
+
+def _format_caption(video):
+    title = _safe_str(video.get("title") or "بدون عنوان")[:200]
+    channel = _safe_str(video.get("uploader") or video.get("channel") or "غير معروف")
+    duration = _fmt_duration(video.get("duration"))
+    views = _fmt_views(video.get("view_count"))
+    upload_date = _fmt_upload_date(video.get("upload_date"))
+
+    return (
+        f"**{title}**\n\n"
+        f"❰ **المدة :** {duration}\n"
+        f"❰ **المشاهدات :** {views} views\n"
+        f"❰ **تاريخ الرفع :** {upload_date}\n"
+        f"❰ **القناة :** {channel}"
+    )
+
+def _build_buttons(search_id, idx, total, video_id):
+    return [
+        [
+            Button.inline("⬅️ السابق", data=f"ytp:{search_id}:{idx-1}"),
+            Button.inline(f"📄 {idx+1} / {total}", data="ytinfo"),
+            Button.inline("التالي ➡️", data=f"ytp:{search_id}:{idx+1}"),
+        ],
+        [
+            Button.inline("🎵 تحميل صوت", data=f"ytdl:a:{search_id}:{video_id}"),
+            Button.inline("📜 القائمة", data=f"ytlist:{search_id}"),
+            Button.inline("🎬 تحميل فيديو", data=f"ytdl:v:{search_id}:{video_id}"),
+        ],
+    ]
+
+def _purge_cache():
+    now = time.time()
+    for d in (SEARCH_CACHE, READY_CACHE):
+        for k in [k for k, v in d.items() if now - v.get("ts", 0) > CACHE_TTL]:
+            d.pop(k, None)
+
+
+async def _bot_username():
+    if _BOT_USERNAME_CACHE["value"]:
+        return _BOT_USERNAME_CACHE["value"]
+    raw = (getattr(Config, "TG_BOT_USERNAME", "") or "").replace("@", "").strip()
+    if raw:
+        _BOT_USERNAME_CACHE["value"] = raw
+        return raw
+    try:
+        me = await luxur.tgbot.get_me()
+        if me and me.username:
+            _BOT_USERNAME_CACHE["value"] = me.username
+            return me.username
+    except Exception:
+        pass
+    return None
+
+
+async def _enrich_video(video):
+    """يجيب بيانات كاملة للفيديو (تاريخ رفع، مشاهدات دقيقة، الخ)."""
+    if video.get("_enriched"):
+        return video
+    vid = video.get("id")
+    if not vid:
+        return video
+
+    lock = ENRICH_LOCKS.setdefault(vid, asyncio.Lock())
+    async with lock:
+        if video.get("_enriched"):
+            return video
+        try:
+            url = f"https://www.youtube.com/watch?v={vid}"
+            full = await asyncio.to_thread(_info_ydl.extract_info, url, False)
+            if full:
+                for key in ("title", "uploader", "channel", "duration",
+                            "view_count", "upload_date", "thumbnail"):
+                    if full.get(key):
+                        video[key] = full[key]
+                video["_enriched"] = True
+        except Exception:
+            video["_enriched"] = True
+    return video
+
+# ======================== أمر البحث (UserBot Side) ========================
+@luxur.ar_cmd(pattern=r"يوتيوب(?:\s|$)([\s\S]*)")
+async def luxury_yt_search(event):
+    query = event.pattern_match.group(1).strip()
+    if not query:
+        return await edit_delete(event, "**💎 يرجى كتابة اسم الفيديو للبحث.**")
+
+    proc = await edit_or_reply(event, "**⇆ جاري البحث عن النتائج ...**")
+    bot_username = await _bot_username()
+    if not bot_username:
+        return await proc.edit("**❌ تعذر استخراج يوزر البوت المساعد.**")
+
+    try:
+        info = await asyncio.to_thread(_search_ydl.extract_info, f"ytsearch15:{query}", False)
+        entries = (info or {}).get("entries") or []
+        entries = [e for e in entries if e and e.get("id")]
+        if not entries: return await proc.edit("**❌ لم يتم العثور على نتائج.**")
+
+        search_id = secrets.token_urlsafe(5)[:8]
+        SEARCH_CACHE[search_id] = {"results": entries, "ts": time.time(), "chat_id": event.chat_id}
+        _purge_cache()
+
+        try:
+            results = await event.client.inline_query(bot_username, f"yt:{search_id}")
+        except Exception as e:
+            return await proc.edit(f"**❌ فشل التواصل مع البوت @{bot_username}:**\n`{e}`")
+
+        if not results:
+            return await proc.edit("**❌ البوت المساعد لم يرجع نتائج.**")
+        
+        await results[0].click(event.chat_id, reply_to=event.reply_to_msg_id, hide_via=False)
+        await proc.delete()
+    except Exception as e:
+        await proc.edit(f"**⚠️ خطأ في البحث:** `{e}`")
+
+
+# ======================== معالج الإنلاين السري والعادي (Bot Side) ========================
+@luxur.tgbot.on(events.InlineQuery())
+async def assistant_inline_handler(event):
+    q = (event.text or "").strip()
+    
+    if q.startswith("send:"):
+        vid_id = q.split(":")[1]
+        cached_data = READY_CACHE.get(vid_id)
+        if not cached_data: return
+        
+        result = await event.builder.document(
+            file=cached_data["media"],
+            title="تحميل المقطع",
+            text=cached_data["caption"]
+        )
+        return await event.answer([result], cache_time=1, private=True)
+
+    if not q.startswith("yt:"): return
+    search_id = q[3:].strip()
+
+    try:
+        cache = SEARCH_CACHE.get(search_id)
+        if not cache:
+            err = await event.builder.article(
+                title="انتهت جلسة البحث",
+                text="**❌ انتهت جلسة البحث، ابحث من جديد.**",
+            )
+            return await event.answer([err], cache_time=1, private=True)
+
+        entries = cache["results"]
+        total = len(entries)
+        video = entries[0]
+        title = _safe_str(video.get("title") or "نتيجة")[:60]
+        caption = _format_caption(video, 0, total)
+        buttons = _build_buttons(search_id, 0, total, video.get("id"))
+        thumb = _thumb_url(video)
+        
+        thumb_doc = InputWebDocument(url=thumb, size=0, mime_type="image/jpeg", attributes=[])
+        vid_url = f"https://www.youtube.com/watch?v={video.get('id')}" if video.get("id") else ""
+
+        result = await event.builder.article(
+            title=title,
+            description=_safe_str(video.get("uploader") or "")[:60],
+            text=caption,
+            url=vid_url,
+            buttons=buttons,
+            thumb=thumb_doc,
+            link_preview=True
+        )
+        await event.answer([result], cache_time=1, private=True)
+    except Exception: pass
+
+
+# ======================== معالج التنقل بين الصفحات ========================
+@luxur.tgbot.on(events.CallbackQuery(pattern=re.compile(rb"^ytp:([A-Za-z0-9_\-]+):(-?\d+)$")))
+async def on_yt_page(event):
+    search_id = event.data_match.group(1).decode()
+    idx = int(event.data_match.group(2).decode())
+    cache = SEARCH_CACHE.get(search_id)
+    
+    if not cache: return await event.answer("⚠️ انتهت جلسة البحث.", alert=True)
+    entries = cache["results"]
+    total = len(entries)
+    if idx < 0 or idx >= total: return await event.answer("🚫 لا توجد نتائج أخرى.")
+
+    video = entries[idx]
+    cache["ts"] = time.time()  
+    caption = _format_caption(video, idx, total)
+    buttons = _build_buttons(search_id, idx, total, video.get("id"))
+
+    try: await event.edit(caption, buttons=buttons, link_preview=True)
+    except Exception: pass
+
+
+@luxur.tgbot.on(events.CallbackQuery(pattern=re.compile(rb"^ytlist:([A-Za-z0-9_\-]+)$")))
+async def on_yt_list(event):
+    search_id = event.data_match.group(1).decode()
+    cache = SEARCH_CACHE.get(search_id)
+    if not cache: return await event.answer("⚠️ انتهت الجلسة.", alert=True)
+
+    results = cache["results"]
+    text = "**📑 نتائج البحث الحالية:**\n\n"
+    for idx, v in enumerate(results):
+        title = _safe_str(v.get("title") or "بدون عنوان")[:60]
+        text += f"**{idx + 1}.** `{title}`\n"
+    text += "\n**💎 سـورس لوكـجوري ✓**"
+
+    buttons = [[Button.inline("🔙 رجوع للنتائج", data=f"ytp:{search_id}:0")]]
+    try: await event.edit(text, buttons=buttons, link_preview=False)
+    except Exception: pass
+
+@luxur.tgbot.on(events.CallbackQuery(data=b"ytinfo"))
+async def on_yt_info(event):
+    await event.answer("ℹ️ استخدم أزرار التنقل ⬅️ ➡️")
+
+
+# ======================== معالج التحميل للإنلاين ========================
+@luxur.tgbot.on(events.CallbackQuery(pattern=re.compile(rb"^ytdl:(a|v):([A-Za-z0-9_\-]+):([A-Za-z0-9_\-]{6,15})$")))
+async def on_yt_download(event):
+    dl_type = event.data_match.group(1).decode()
+    search_id = event.data_match.group(2).decode()
+    video_id = event.data_match.group(3).decode()
+
+    cache = SEARCH_CACHE.get(search_id)
+    target_chat = cache.get("chat_id") if cache else event.sender_id
+
+    await event.answer("📥 جاري التحميل... سيتم إرساله كرسالة جديدة 📩", alert=False)
+
+    file_path = None
+    thumb_path = None
+    try:
+        file_path, info = await _download_youtube(video_id, dl_type)
+        if not file_path or not os.path.exists(file_path): return
+
+        size = os.path.getsize(file_path)
+        if size > MAX_UPLOAD_BYTES: return
+
+        bu = await _bot_username()
+        thumb_url = info.get("thumbnail")
+        thumb_path = await asyncio.to_thread(_download_thumb_sync, thumb_url)
+        
+        await _upload_and_inline(
+            target_chat, file_path, thumb_path,
+            title=info.get("title", "بدون عنوان"),
+            is_audio=(dl_type == "a"),
+            performer=info.get("uploader") or info.get("channel") or "Unknown",
+            duration=int(info.get("duration") or 0),
+            bot_username=bu,
+        )
+    except Exception: pass
+    finally:
+        for p in (file_path, thumb_path):
+            if p and os.path.exists(p):
+                try: os.remove(p)
+                except: pass
+
+
+# ======================== أمر التحميل الخارجي المباشر (بدون إنلاين) ========================
+@luxur.ar_cmd(pattern=r"حمل(?:\s+(صوت|فيديو))?(?:\s|$)([\s\S]*)")
+async def luxury_dl_anywhere(event):
+    mode = event.pattern_match.group(1)  
+    arg = (event.pattern_match.group(2) or "").strip()
+    reply = await event.get_reply_message()
+
+    url = None
+    m = re.search(r"https?://\S+", arg)
+    if m: url = m.group(0)
+    elif reply and reply.text:
+        m = re.search(r"https?://\S+", reply.text)
+        if m: url = m.group(0)
+
+    if not url: return await edit_delete(event, "**⚠️ يرجى إرسال رابط صحيح.**")
+
+    is_audio = (mode == "صوت")
+    proc = await edit_or_reply(event, f"**📥 جاري التحميل ({'صوت 🎵' if is_audio else 'فيديو 🎬'}) ...**")
+
+    file_path = None
+    thumb_path = None
+    try:
+        file_path, info = await _download_url(url, is_audio)
+        if not file_path or not os.path.exists(file_path):
+            return await proc.edit("**❌ فشل التحميل: ملف غير موجود.**")
+
+        size = os.path.getsize(file_path)
+        if size > MAX_UPLOAD_BYTES:
+            return await proc.edit(f"**❌ حجم الملف أكبر من حد الرفع.**")
+
+        bu = await _bot_username()
+        icon = "🎵" if is_audio else "🎬"
+        caption = f"**Download Done . {icon} \"**\n\n**⚡ : By:** @{bu} 🦅"
+        
+        thumb_url = info.get("thumbnail")
+        thumb_path = await asyncio.to_thread(_download_thumb_sync, thumb_url)
+        
+        title = info.get("title", "بدون عنوان")
+        performer = info.get("uploader") or info.get("channel") or "Unknown"
+        duration = int(info.get("duration") or 0)
+
+        attributes = []
+        if is_audio:
+            attributes.append(DocumentAttributeAudio(
+                duration=duration, title=title[:64], performer=performer[:64]
+            ))
+        else:
+            attributes.append(DocumentAttributeVideo(
+                duration=duration, w=1280, h=720, supports_streaming=True
+            ))
+
+        await event.client.send_file(
+            event.chat_id,
+            file=file_path,
+            caption=caption,
+            thumb=thumb_path,
+            attributes=attributes,
+            reply_to=event.reply_to_msg_id
+        )
+        await proc.delete()
+    except Exception as e:
+        await proc.edit(f"**❌ فشل التحميل:** `{e}`")
+    finally:
+        for p in (file_path, thumb_path):
+            if p and os.path.exists(p):
+                try: os.remove(p)
+                except: pass
+
+
+# ======================== أدوات التحميل (MP3 واسم الملف) ========================
+async def _download_youtube(video_id, dl_type):
+    opts = {
+        "outtmpl": os.path.join(DL_DIR, "%(title)s.%(ext)s"),
+        "quiet": True, "no_warnings": True, "noplaylist": True, "javascript_engine": "deno",
+        "extractor_args": {"youtube": {"player_client": ATTACK_CLIENTS}},
+        "cookiefile": COOKIE_PATH if HAS_COOKIES else None,
+    }
+
+    if dl_type == "a":
+        opts["format"] = "bestaudio/best"
+        opts["postprocessors"] = [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "192"}]
+    else:
+        opts["format"] = "bestvideo[height<=720]+bestaudio/best[height<=720]/best"
+        opts["merge_output_format"] = "mp4"
+
+    opts = {k: v for k, v in opts.items() if v is not None}
+    url = f"https://www.youtube.com/watch?v={video_id}"
+
+    with YoutubeDL(opts) as ydl:
+        info = await asyncio.to_thread(ydl.extract_info, url, True)
+        file_path = ydl.prepare_filename(info)
+
+    file_path = _resolve_real_path(file_path, is_audio=(dl_type == "a"))
+    return file_path, info
+
+async def _download_url(url, is_audio):
+    opts = {
+        "outtmpl": os.path.join(DL_DIR, "%(title)s.%(ext)s"),
+        "quiet": True, "no_warnings": True, "noplaylist": True, "javascript_engine": "deno",
+        "cookiefile": COOKIE_PATH if HAS_COOKIES else None,
+    }
+
+    if is_audio:
+        opts["format"] = "bestaudio/best"
+        opts["postprocessors"] = [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "192"}]
+    else:
+        opts["format"] = "bestvideo[height<=720]+bestaudio/best[height<=720]/best"
+        opts["merge_output_format"] = "mp4"
+
+    opts = {k: v for k, v in opts.items() if v is not None}
+    with YoutubeDL(opts) as ydl:
+        info = await asyncio.to_thread(ydl.extract_info, url, True)
+        file_path = ydl.prepare_filename(info)
+
+    file_path = _resolve_real_path(file_path, is_audio=is_audio)
+    return file_path, info
+
+def _resolve_real_path(p, is_audio=False):
+    if os.path.exists(p): return p
+    base, _ = os.path.splitext(p)
+    if is_audio:
+        for ext in ("mp3", "m4a", "ogg", "wav"):
+            if os.path.exists(f"{base}.{ext}"): return f"{base}.{ext}"
+    else:
+        for ext in ("mp4", "mkv", "webm"):
+            if os.path.exists(f"{base}.{ext}"): return f"{base}.{ext}"
+    return p
+
+
+# ======================== الدالة السحرية لإرسال الإنلاين ========================
+async def _upload_and_inline(target_chat, file_path, thumb_path, title, is_audio, performer, duration, bot_username):
+    icon = "🎵" if is_audio else "🎬"
+    caption = f"**Download Done . {icon} \"**\n\n**⚡ : By:** @{bot_username} 🦅"
+    
+    attributes = []
+    if is_audio:
+        attributes.append(DocumentAttributeAudio(
+            duration=duration or 0,
+            title=title[:64] if title else None,
+            performer=(performer or None) and performer[:64],
+        ))
+    else:
+        attributes.append(DocumentAttributeVideo(
+            duration=duration or 0, w=1280, h=720, supports_streaming=True
+        ))
+
+    dump_msg = await luxur.send_file(
+        'me', 
+        file_path, 
+        caption=caption, 
+        thumb=thumb_path,
+        attributes=attributes, 
+        supports_streaming=True
+    )
+    
+    vid_id = secrets.token_urlsafe(6)
+    READY_CACHE[vid_id] = {
+        "media": dump_msg.media,
+        "caption": caption,
+        "ts": time.time()
+    }
+    
+    try:
+        results = await luxur.inline_query(bot_username, f"send:{vid_id}")
+        if results:
+            await results[0].click(target_chat)
+    except Exception:
+        await luxur.forward_messages(target_chat, dump_msg)
+    
+    try: await dump_msg.delete()
+    except Exception: pass

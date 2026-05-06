@@ -19,9 +19,6 @@ from ..helpers.utils import reply_id, _catutils, parse_pre, yaml_format, install
 
 plugin_category = "utils"
 
-# تعديل الحقوق لـ لوكـجوري
-# المطور: 8461813715
-# القناة: @BN_0T
 
 rehu = [
     "شكم مره كتلك خلي نفلش الكروب",

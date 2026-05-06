@@ -1,12 +1,8 @@
-#edit  ~ @lMl10l for luxur 
-
 from telethon import events
 from LuxuryUB.utils import admin_cmd
 from LuxuryUB import luxur
 from . import *
  
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
-
 plugin_category = "extra"
 @luxur.ar_cmd(
     pattern="س1$",
@@ -22,8 +18,6 @@ async def tmgif(event):
         luxur += f"**الـمتحـرڪـة الأولـى **"
         await event.client.send_file(event.chat_id, sad, caption=luxur, reply_to=lMl10l)
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
 
 @luxur.ar_cmd(
     pattern="س2$",
@@ -39,9 +33,6 @@ async def tmgif(event):
         RAZAN += f"**الـمتحـرڪـة الـثـانيـة **"
         await event.client.send_file(event.chat_id, sad2, caption=RAZAN, reply_to=leo)
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
-
 @luxur.ar_cmd(
     pattern="س3$",
     command=("س3", plugin_category),
@@ -56,8 +47,6 @@ async def tmgif(event):
         RAZAN += f"**الـمتحـرڪـة الـثـالثـة**\n"
         await event.client.send_file(event.chat_id, sad3, caption=RAZAN, reply_to=sic_id)
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
 
 @luxur.ar_cmd(
     pattern="س4$",
@@ -75,8 +64,7 @@ async def tmgif(event):
             event.chat_id, sad4, caption=RAZAN, reply_to=reply_to_id
         )
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
+
 
 @luxur.ar_cmd(
     pattern="س5$",
@@ -95,8 +83,6 @@ async def tmgif(event):
             event.chat_id, sad5, caption=RAZAN, reply_to=reply_to_id
         )
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
 
 @luxur.ar_cmd(
     pattern="س6$",
@@ -115,8 +101,7 @@ async def tmgif(event):
             event.chat_id, sad6, caption=RAZAN, reply_to=reply_to_id
         )
 
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
+
 
 @luxur.ar_cmd(
     pattern="س7$",
@@ -166,5 +151,4 @@ async def tmgif(event):
         await event.client.send_file(
             event.chat_id, sad9, caption=RAZAN, reply_to=reply_to_id
         )
-#edit  ~ @lMl10l for luxur 
-#جميع الحقوق محفوظة لسـورس الجوكر تخـمط تبيـن فشلـك
+

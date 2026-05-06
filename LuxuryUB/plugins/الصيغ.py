@@ -1,3 +1,4 @@
+# انشاء @ee2en لا تنسب لنفسك
 import asyncio
 import os
 import re
@@ -10,7 +11,6 @@ from ..Config import Config
 
 plugin_category = "misc"
 
-# إنشاء مجلد مؤقت للملفات حتى ما تصير هوسة بالاستضافة
 temp_dir = "temp_media"
 os.makedirs(temp_dir, exist_ok=True)
 
@@ -192,7 +192,6 @@ async def pinterestAljoker(event):
     pinterest_url = event.pattern_match.group(1).strip()
     await event.edit("**᯽︙ يتـم جـلـب الـصـورة مـن بـنـتـريـست، انتـظر قليلا... ⏱**")
     
-    # إضافة رؤوس (Headers) لخدع الموقع
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
@@ -202,12 +201,9 @@ async def pinterestAljoker(event):
         response = requests.get(pinterest_url, headers=headers, timeout=10)
         content_type = response.headers.get('content-type', '')
 
-        # إذا كان الرابط مباشر لصورة
         if 'image' in content_type:
             img_data = response.content
-        # إذا كان الرابط لصفحة (Pin)، نبحث عن رابط الصورة في الكود
         else:
-            # البحث عن رابط الصورة الأصلي داخل كود الصفحة (Meta Tags)
             re_image = re.search(r'property="og:image" content="([^"]+)"', response.text)
             if re_image:
                 img_url = re_image.group(1)
@@ -215,7 +211,6 @@ async def pinterestAljoker(event):
             else:
                 return await event.edit("**᯽︙ فشل العثور على الصورة في هذا الرابط ⚠️**")
 
-        # حفظ وإرسال الصورة
         img_path = f"{temp_dir}/pin_{round(time.time())}.jpg"
         with open(img_path, 'wb') as f:
             f.write(img_data)

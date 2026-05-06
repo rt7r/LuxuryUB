@@ -11,7 +11,6 @@ from pySmartDL import SmartDL
 from LuxuryUB.core.session import luxur
 from ..Config import Config
 
-# --- نظام العزل والقاعدة ---
 def get_db():
     db_path = f"vars_{luxur.uid}.json"
     if not os.path.exists(db_path): return {}
@@ -27,7 +26,6 @@ def get_font(num_str, db):
     norm = "1234567890"
     return "".join(font[norm.index(n)] if n in norm else n for n in num_str)
 
-# --- محرك الوقتي ---
 async def time_loop():
     while not luxur.is_connected(): await asyncio.sleep(1)
     while True:
@@ -41,7 +39,6 @@ async def time_loop():
         hm = now.strftime("%I:%M")
         z_hm = get_font(hm, db)
         
-        # 1. الاسم الوقتي
         if db.get("autoname") == "true":
             try:
                 me = await luxur.get_me()
@@ -50,14 +47,12 @@ async def time_loop():
                 await luxur(functions.account.UpdateProfileRequest(first_name=first_n, last_name=last_n))
             except: pass
 
-        # 2. البايو الوقتي
         if db.get("autobio") == "true":
             try:
                 bio = f"{db.get('DEFAULT_BIO', 'إِنَّ ٱللَّهَ وَمَلَٰٓئِكَتَهُۥ يُصَلُّونَ عَلَى ٱلنَّبِيِّۚ يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُواْ صَلُّواْ عَلَيۡهِ وَسَلِّمُواْ تَسۡلِيمًا ٥٦')} | {z_hm}"
                 await luxur(functions.account.UpdateProfileRequest(about=bio[:70]))
             except: pass
 
-        # 3. الصورة الوقتية
         if db.get("digitalpic") == "true":
             try:
                 img_url = db.get("DIGITAL_PIC", "https://telegra.ph/file/63a826d5e5f0003e006a0.jpg")
@@ -72,7 +67,6 @@ async def time_loop():
                 await luxur(functions.photos.UploadProfilePhotoRequest(file=await luxur.upload_file("upload.png")))
             except: pass
 
-        # 4. الكروب الوقتي
         if db.get("digitalgroup"):
             try:
                 chid = int(db.get("digitalgroup"))
@@ -81,7 +75,6 @@ async def time_loop():
 
         await asyncio.sleep(60)
 
-# --- أوامر التفعيل ---
 @luxur.ar_cmd(pattern="(اسم وقتي|بايو وقتي|الصورة الوقتية)$")
 async def start_time(event):
     mode = event.pattern_match.group(1)
@@ -100,7 +93,6 @@ async def start_time(event):
     save_db(db)
     await event.edit(f"**᯽︙ تم تفعيل {mode} بنجاح ✓**")
 
-# --- أوامر الإنهاء مع الاسترجاع الكامل ---
 @luxur.ar_cmd(pattern="انهاء (اسم وقتي|بايو وقتي|الصورة الوقتية)$")
 async def stop_time(event):
     mode = event.pattern_match.group(1)
@@ -143,5 +135,4 @@ async def stop_group_time(event):
     save_db(db)
     await event.edit(f"**᯽︙ تم إنهاء وقتي الكروب واسترجاع الاسم ✓**")
 
-# تشغيل الماطور بدون فراغات زايدة
 luxur.loop.create_task(time_loop())

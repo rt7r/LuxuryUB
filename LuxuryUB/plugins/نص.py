@@ -7,7 +7,7 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.functions.account import UpdateNotifySettingsRequest
 from LuxuryUB.utils import admin_cmd
 
-@borg.on(admin_cmd(pattern="تحويل نص ?(.*)"))
+@luxur.on(admin_cmd(pattern="تحويل نص ?(.*)"))
 async def _(event):
     if event.fwd_from:
         return 
@@ -38,5 +38,3 @@ async def _(event):
              await event.delete()
              await event.client.send_message(event.chat_id, response.message)
              
-# Copyright (C) 2021 LuxuryUB TEAM
-# FILES WRITTEN BY  @lMl10l

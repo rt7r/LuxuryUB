@@ -11,9 +11,7 @@ from . import BOTLOG_CHATID
 LOGS = logging.getLogger(__name__)
 extractor = URLExtract()
 
-# =======================================================
-# --- دوال قاعدة البيانات (JSON) الشاملة للتنصيب الداخلي ---
-# =======================================================
+
 def get_db(client_id):
     db_path = f"vars_{client_id}.json"
     if not os.path.exists(db_path): 
@@ -77,7 +75,6 @@ async def custom_HuRe(event):
     input_str = event.pattern_match.group(1).strip()
     var = None
     
-    # تحويل الأسماء العربية إلى المتغيرات البرمجية
     if input_str in ["كليشة الحماية", "كليشة الحمايه", "كليشه الحماية", "كليشه الحمايه"]: var = "pmpermit_txt"
     elif input_str in ["اشتراك الخاص", "اشتراك خاص"]: var = "pchan"
     elif input_str in ["اشتراك كروب", "اشتراك الكروب"]: var = "gchan"
@@ -95,7 +92,7 @@ async def custom_HuRe(event):
     elif input_str in ["التخزين", "تخزين"]: var = "PM_LOGGER_GROUP_ID"
     elif input_str in ["كليشة الخاص", "كليشه الخاص"]: var = "aljoker_message"
     elif input_str in ["اشعارات", "الاشعارات"]: var = "PRIVATE_GROUP_BOT_API_ID"
-    else: var = input_str # إذا لم يكن بالقائمة يحفظه باسمه المباشر
+    else: var = input_str
         
     if var:
         # الحفظ فقط بنظام JSON

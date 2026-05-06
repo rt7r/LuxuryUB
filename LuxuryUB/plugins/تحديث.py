@@ -14,22 +14,17 @@ from ..Config import Config
 from ..core.logger import logging
 from ..core.managers import edit_delete, edit_or_reply
 
-# إعدادات السجل
 LOGS = logging.getLogger(__name__)
 plugin_category = "tools"
 
-# --- ثوابت التحديث (Luxury Style) ---
 HEROKU_APP_NAME = Config.HEROKU_APP_NAME or None
 HEROKU_API_KEY = Config.HEROKU_API_KEY or None
 UPSTREAM_REPO_URL = "https://github.com/rt7r/LuxuryUB" 
 UPSTREAM_REPO_BRANCH = "main"
 
-# قائمة المطورين المسموح لهم بالتحديث الإجباري (أنت فقط)
-progs = [1165225957] # آيديك وآيدي مطور السورس الأساسي
+progs = [1165225957] 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# --- دوال مساعدة ---
 
 async def gen_chlog(repo, diff):
     """توليد قائمة التغييرات البرمجية"""
@@ -81,7 +76,6 @@ async def deploy(event, repo, ups_rem, ac_br):
     except Exception as e:
         await event.edit(f"**❌ حدث خطأ في هيروكو:**\n`{str(e)}`")
 
-# --- الأوامر الرئيسية ---
 
 @luxur.ar_cmd(
     pattern="تحديث(| الان)?$",
@@ -127,11 +121,9 @@ async def upstream(event):
     if HEROKU_API_KEY and HEROKU_APP_NAME:
         await deploy(event, repo, ups_rem, UPSTREAM_REPO_BRANCH)
     else:
-        # نظام التحديث للاستضافات و VPS
         import shutil
         import os
         
-        # 🛡️ حركة الحماية: أخذ نسخة احتياطية من الكونفك قبل التحديث
         config_path = "config.py"
         backup_path = "config_backup.temp"
         if os.path.exists(config_path):
@@ -143,7 +135,6 @@ async def upstream(event):
             repo.git.reset("--hard", "FETCH_HEAD")
             await event.edit("**⚠️ تم تصفير التغييرات المحلية لتخطي التعارض...**")
             
-        # 🛡️ إرجاع الكونفك الأصلي مالتك بعد التحديث (غصباً عن الكيت هاب)
         if os.path.exists(backup_path):
             shutil.move(backup_path, config_path)
 
@@ -151,7 +142,6 @@ async def upstream(event):
             await update_requirements()
             
             
-            # 🔥 نظام خزن الآيدي حتى يجاوبك بعد ما يشتغل
             try:
                 from ..sql_helper.global_collection import add_to_collectionlist
                 from ..sql_helper.globals import addgvar
@@ -160,7 +150,6 @@ async def upstream(event):
             except Exception as e:
                 LOGS.error(f"Error saving update state: {e}")
                 
-            # 📢 2. إرسال إشعار لكل الحسابات المنصبة (الحسابات الفرعية)
             try:
                 from ..sql_helper.global_collectionjson import get_collections
                 from telethon import TelegramClient
@@ -179,14 +168,12 @@ async def upstream(event):
             except Exception as e:
                 LOGS.error(f"Error notifying sub-accounts: {e}")
             
-            # 🔥 رسالة التحديث مدمجة ويه التغييرات
             await event.edit(f"**✅ تم تحديث سورس لوكجوري بنجاح!**\n\n**📝 التغييرات اللي صارت:**\n{changelog}\n\n**♻️ جاري إعادة التشغيل...**")
             os.execl(sys.executable, sys.executable, "-m", "LuxuryUB")
         except GitCommandError:
             repo.git.reset("--hard", "FETCH_HEAD")
             await event.edit("**⚠️ تم تصفير التغييرات المحلية والتحديث بنجاح. أعد تشغيل البوت.**")
 
-# --- أوامر المطورين ---
 
 @luxur.on(events.NewMessage(incoming=True))
 async def dev_updates(event):

@@ -1,4 +1,3 @@
-import base64
 import asyncio
 from datetime import datetime
 from telethon import events
@@ -33,10 +32,9 @@ def add_to_mute_list(user):
 
     
 def remove_from_mute_list(user_id):
-    global file_path  # Ensure you are modifying the global file_path
+    global file_path  
     file_path = [id for id in file_path if id != str(user_id)]
 
-#=================== الكـــــــــــــــتم  ===================  #
 
 @luxur.ar_cmd(pattern=f"كتم(?:\s|$)([\s\S]*)")
 async def mutejep(event):
@@ -51,7 +49,7 @@ async def mutejep(event):
         if event.chat_id == 1165225957:
             return await edit_delete(event, "** دي . . لا يمڪنني كتـم مطـور السـورس  ╰**")
         try:
-            mute(event.chat_id, event.chat_id)  # Corrected this line
+            mute(event.chat_id, event.chat_id)  
             add_to_mute_list(replied_user)
         except Exception as e:
             await event.edit(f"**- خطــأ : **`{e}`")
@@ -150,7 +148,6 @@ async def handle_forwarded(event):
     if event.fwd_from:
         if is_muted(event.sender_id, event.chat_id):
             await event.delete()
-#=================== الغـــــــــــــاء الكـــــــــــــــتم  ===================  #
 
 @luxur.ar_cmd(pattern=f"(الغاء الكتم|الغاء كتم)(?:\s|$)([\s\S]*)")
 async def unmutejep(event):
@@ -163,7 +160,7 @@ async def unmutejep(event):
         try:
             unmute(event.chat_id, event.chat_id)
             if str(replied_user.id) in file_path:
-                remove_from_mute_list(replied_user.id)  # Ensure user ID is removed from the list
+                remove_from_mute_list(replied_user.id)  
         except Exception as e:
             await event.edit(f"**- خطــأ : **`{e}`")
         else:
@@ -195,10 +192,10 @@ async def unmutejep(event):
             return await event.edit("**- يرجى تقديم المعرف أو اسم المستخدم، أو الرد على رسالة المستخدم**")
 
         try:
-            if is_muted(user.id, event.chat_id):  # Corrected this line
-                unmute(user.id, event.chat_id)  # Corrected this line
-                if str(user.id) in file_path:  # Ensure file_path contains user ids as strings
-                    remove_from_mute_list(user.id)  # Use user.id instead of user
+            if is_muted(user.id, event.chat_id):  
+                unmute(user.id, event.chat_id)  
+                if str(user.id) in file_path:  
+                    remove_from_mute_list(user.id)  
             else:
                 result = await event.client.get_permissions(event.chat_id, user.id)
                 if result.participant.banned_rights.send_messages:
@@ -246,11 +243,9 @@ async def show_muted_users(event):
             await event.edit("**᯽︙ لا يوجد مستخدمين مكتومين حاليًا**")
     else:
         await event.edit("**᯽︙ لا يوجد مستخدمين مكتومين حاليًا**")
-# ===================================== # 
 
 @luxur.ar_cmd(incoming=True)
 async def watcher(event):
     if is_muted(event.sender_id, "كتم_مؤقت"):
         await event.delete()
 
-#=====================================  #

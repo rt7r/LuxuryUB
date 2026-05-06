@@ -1,14 +1,11 @@
-#ترجمه فريق الجوكر على التيلكرام
 import json
 
 import requests
-#ترجمه فريق الجوكر على التيلكرام
 from ..sql_helper.globals import gvarstatus
 from . import luxur, edit_delete, edit_or_reply
 
 plugin_category = "extra"
 
-#ترجمه فريق الجوكر على التيلكرام
 @luxur.ar_cmd(
     pattern="صلاة(?: |$)(.*)",
     command=("صلاة", plugin_category),

@@ -3,7 +3,6 @@ import asyncio
 import random
 import re
 import json
-import base64
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from asyncio.exceptions import TimeoutError
 from telethon import events
@@ -55,7 +54,7 @@ async def _(event):
                 result = await conv.get_response()
                 await event.client.send_read_acknowledge(conv.chat_id)
             except YouBlockedUserError:
-                await event.edit("```Mohon buka blokir (@auddbot) dan coba lagi```")
+                await event.edit("```يُرجى إلغاء حظر (@auddbot) والمحاولة مرة أخرى.```")
                 return
             namem = f"**الأغنية : **{result.text.splitlines()[0]}\
         \n\n**التفاصيـل : **{result.text.splitlines()[2]}"
@@ -209,6 +208,12 @@ async def jepmeme(memejep):
 async def jepmeme(memejep):
   Jep = await reply_id(memejep)
   url = f"https://t.me/AljokerUB/19"
+  await memejep.client.send_file(memejep.chat_id,url,caption="",parse_mode="html",reply_to=Jep)
+  await memejep.delete()
+@luxur.on(admin_cmd(outgoing=True, pattern="زيج3$"))
+async def jepmeme(memejep):
+  Jep = await reply_id(memejep)
+  url = f""
   await memejep.client.send_file(memejep.chat_id,url,caption="",parse_mode="html",reply_to=Jep)
   await memejep.delete()
 @luxur.on(admin_cmd(outgoing=True, pattern="زيج$"))
@@ -576,68 +581,39 @@ async def jepmeme(memejep):
   await memejep.delete()
     
 @luxur.on(admin_cmd(outgoing=True, pattern=r"ميمز (\S+) (.+)"))
-async def Hussein(event):
+async def add_meme(event):
     url = event.pattern_match.group(1)
-    lMl10l = event.pattern_match.group(2)
-    add_link(lMl10l, url)
-    await event.edit(f"**᯽︙ تم اضافة البصمة {lMl10l} بنجاح ✓ **")
-    joker = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-    joker = Get(joker)
-    try:
-        await event.client(joker)
-    except BaseException:
-        pass
+    meme_name = event.pattern_match.group(2)
+    add_link(meme_name, url)
+    await event.edit(f"**✧ ¦ تم إضافة البصمة '{meme_name}' بنجاح ✓**")
 
 @luxur.on(admin_cmd(outgoing=True, pattern="?(.*)"))
-async def Hussein(event):
-    lMl10l = event.pattern_match.group(1)
-    Joker = await reply_id(event)
-    url = get_link(lMl10l)
+async def send_meme(event):
+    meme_name = event.pattern_match.group(1)
+    reply_msg = await reply_id(event)
+    url = get_link(meme_name)
     if url:
-        await event.client.send_file(event.chat_id, url, parse_mode="html", reply_to=Joker)
+        await event.client.send_file(event.chat_id, url, parse_mode="html", reply_to=reply_msg)
         await event.delete()
-        joker = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-        joker = Get(joker)
-        try:
-            await event.client(joker)
-        except BaseException:
-            pass
 
 @luxur.ar_cmd(pattern="ازالة(?:\s|$)([\s\S]*)")
-async def delete_aljoker(event):
-    lMl10l = event.pattern_match.group(1)
-    delete_link(lMl10l)
-    await event.edit(f"**᯽︙ تم حذف البصمة '{lMl10l}' بنجاح ✓**")
-    joker = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-    joker = Get(joker)
-    try:
-        await event.client(joker)
-    except BaseException:
-        pass
+async def remove_meme(event):
+    meme_name = event.pattern_match.group(1)
+    delete_link(meme_name)
+    await event.edit(f"**✧ ¦ تم حذف البصمة '{meme_name}' بنجاح ✓**")
 
 @luxur.on(admin_cmd(outgoing=True, pattern="قائمة الميمز"))
-async def list_aljoker(event):
+async def list_memes(event):
     links = SESSION.query(AljokerLink).all()
     if links:
-        message = "**᯽︙ قائمة تخزين اوامر الميمز:**\n"
+        message = "**✧ ¦ قائمة الميمز المحفوظة لديك:**\n\n"
         for link in links:
-            message += f"- البصمة : .`{link.key}`\n"
+            message += f"⚚ البصمة : `{link.key}`\n"
     else:
-        message = "**᯽︙ لاتوجد بصمات ميمز مخزونة حتى الآن**"
+        message = "**✧ ¦ لا توجد بصمات ميمز محفوظة حتى الآن!**"
     await event.edit(message)
-    joker = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-    joker = Get(joker)
-    try:
-        await event.client(joker)
-    except BaseException:
-        pass
+
 @luxur.on(admin_cmd(outgoing=True, pattern="ازالة_البصمات"))
-async def delete_all_aljoker(event):
+async def remove_all_memes(event):
     SESSION.query(AljokerLink).delete()
-    await event.edit("**᯽︙ تم حذف جميع بصمات الميمز من القائمة **")
-    joker = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-    joker = Get(joker)
-    try:
-        await event.client(joker)
-    except BaseException:
-        pass
+    await event.edit("**✧ ¦ تم مسح جميع بصمات الميمز من القائمة**")

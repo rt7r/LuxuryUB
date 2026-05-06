@@ -12,7 +12,6 @@ from ..core.managers import edit_or_reply, edit_delete
 DL_PATH = "downloads/"
 if not os.path.exists(DL_PATH): os.makedirs(DL_PATH)
 
-# =========================================================
 async def fetch_video_only(client, bot_username, query):
     await client(UnblockRequest(bot_username))
     sent = await client.send_message(bot_username, query)
@@ -57,7 +56,6 @@ async def fetch_audio_only(client, bot_username, query):
     except: pass
     return audio_msg
 
-# =========================================================
 
 @luxur.ar_cmd(pattern="انستا(?:\s|$)([\s\S]*)")
 async def dl_insta(event):
@@ -85,10 +83,9 @@ async def dl_tiktok(event):
 
 @luxur.ar_cmd(pattern="ستوري(?:\s|$)([\s\S]*)")
 async def dl_story(event):
-    # الميزة معطلة بناءً على طلبك
     await edit_or_reply(event, "**᯽︙ عذراً، ميزة الستوري غير متاحة حالياً ⚠️**")
 
-@luxur.ar_cmd(pattern="(بحث|يوت)(?:\s|$)([\s\S]*)")
+@luxur.ar_cmd(pattern="(يوت)(?:\s|$)([\s\S]*)")
 async def dl_youtube_search(event):
     query = event.pattern_match.group(2).strip()
     if not query: return await edit_or_reply(event, "**᯽︙ اكتب اسم الأغنية مع الأمر ⚠️**")
@@ -100,7 +97,6 @@ async def dl_youtube_search(event):
     else:
         await msg.edit("**❌ لم يتم العثور على نتائج.**")
 
-# =========================================================
 
 @luxur.ar_cmd(pattern="(تحميل ص|صوت)(?:\s|$)([\s\S]*)")
 async def dl_local_direct(event):
@@ -108,7 +104,6 @@ async def dl_local_direct(event):
     query = event.pattern_match.group(2).strip()
     if not query: return await edit_or_reply(event, "**᯽︙ ضع الرابط مع الأمر ⚠️**")
     
-    # يوتيوب يمر عبر البوت الخارجي
     if "youtube.com" in query or "youtu.be" in query:
         if cmd == "ف":
             msg = await edit_or_reply(event, "**᯽︙ جـارِ جلب الفيديو من يوتيوب... 📥**")
@@ -142,7 +137,6 @@ async def dl_local_direct(event):
     except Exception:
         await msg.edit(f"**❌ فشل التحميل المباشر.**")
 
-# =========================================================
 @luxur.ar_cmd(pattern="اسم الاغنية$")
 async def shazam_it(event):
     reply = await event.get_reply_message()
@@ -158,7 +152,6 @@ async def shazam_it(event):
         track_info = next(recognize_generator)
         track = track_info[1]['track']
         
-        # هنا مسموح بإرسال الصور (غلاف الأغنية)
         await event.client.send_file(
             event.chat_id, track['images']['background'], 
             caption=f"**᯽︙ تـم العثور على الأغنية ✅**\n\n**🎵 العنوان:** `{track['title']}`\n**👤 الفنان:** `{track['subtitle']}`",
@@ -170,7 +163,6 @@ async def shazam_it(event):
     finally:
         if os.path.exists(file): os.remove(file)
 
-# ميزة الخاص (صوت فقط)
 @luxur.on(events.NewMessage(incoming=True, func=lambda e: e.is_private))
 async def users_pm_search(event):
     if event.sender_id == event.client.uid: return 

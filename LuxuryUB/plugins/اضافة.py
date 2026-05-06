@@ -62,9 +62,6 @@ def user_full_name(user):
  
 
 
-# كتابة فريق الجوكر المتغيرات تثبت ودي
-# تخمط اذكر حقوق غيرها انت فرخ و دي 😂
-
 
 @luxur.on(admin_cmd(pattern=r"ضيف ?(.*)"))
 async def get_users(event):   

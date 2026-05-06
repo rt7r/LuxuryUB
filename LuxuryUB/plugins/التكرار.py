@@ -1,6 +1,4 @@
-# By LuxuryUB 2021-2023
 import asyncio
-import base64
 import re
 from telethon.tl import functions, types
 from telethon.tl.functions.messages import GetStickerSetRequest
@@ -152,21 +150,22 @@ async def stickerpack_spam(event):
     reply = await event.get_reply_message()
     if not reply or media_type(reply) is None or media_type(reply) != "Sticker":
         return await edit_delete(
-            event, "**⌔∮ قم بالردّ على أيّ ملصق لإرسال جميع ملصقات الحزمة  **"
+            event, "**✧ ¦ قم بالردّ على أيّ ملصق لإرسال جميع ملصقات الحزمة 📦**"
         )
-    hmm = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
+        
     try:
         stickerset_attr = reply.document.attributes[1]
         catevent = await edit_or_reply(
-            event, "**⌔∮ جاري إحضار تفاصيل حزمة الملصقات، يرجى الإنتظار قليلا  ⏱**"
+            event, "**✧ ¦ جاري إحضار تفاصيل حزمة الملصقات، يرجى الإنتظار قليلاً ⏱**"
         )
     except BaseException:
         await edit_delete(
             event,
-            "⌔∮ أعتقد أنّ هذا الملصق ليس جزءًا من أيّ حزمة لذا لا أستطيع إيجاد حزمته ⚠️",
+            "**✧ ¦ أعتقد أنّ هذا الملصق ليس جزءًا من أيّ حزمة لذا لا أستطيع إيجاد حزمته ⚠️**",
             5,
         )
         return
+        
     try:
         get_stickerset = await event.client(
             GetStickerSetRequest(
@@ -179,13 +178,10 @@ async def stickerpack_spam(event):
     except Exception:
         return await edit_delete(
             catevent,
-            "⌔∮ أعتقد أنّ هذا الملصق ليس جزءًا من أيّ حزمة لذا لا أستطيع إيجاد حزمته ⚠️",
+            "**✧ ¦ أعتقد أنّ هذا الملصق ليس جزءًا من أيّ حزمة لذا لا أستطيع إيجاد حزمته ⚠️**",
         )
-    try:
-        hmm = Get(hmm)
-        await event.client(hmm)
-    except BaseException:
-        pass
+        
+    
     reqd_sticker_set = await event.client(
         functions.messages.GetStickerSetRequest(
             stickerset=types.InputStickerSetShortName(
@@ -193,27 +189,28 @@ async def stickerpack_spam(event):
             )
         )
     )
+    
     addgvar(Config.OWNER_ID, "spamwork", True)
     for m in reqd_sticker_set.documents:
         if gvarstatus(Config.OWNER_ID, "spamwork") is None:
             return
         await event.client.send_file(event.chat_id, m)
         await asyncio.sleep(0.7)
+        
     if BOTLOG:
         if event.is_private:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "**⌔∮ تكرار الملصق :**\n"
-                + f"**⌔∮ تم تنفيذ الإزعاج بواسطة حزمة الملصقات في  :** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع الحزمة **",
+                "**✧ ¦ تكرار الملصق :**\n"
+                + f"**✧ ¦ تم تنفيذ الإزعاج بواسطة حزمة الملصقات في الخاص مع :** [المستخدم](tg://user?id={event.chat_id})",
             )
         else:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "**⌔∮ تكرار الملصق :**\n"
-                + f"**⌔∮ تم تنفيذ الإزعاج بواسطة حزمة الملصقات في   :** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع الحزمة **",
+                "**✧ ¦ تكرار الملصق :**\n"
+                + f"**✧ ¦ تم تنفيذ الإزعاج بواسطة حزمة الملصقات في الكروب :** {get_display_name(await event.get_chat())}(`{event.chat_id}`)",
             )
         await event.client.send_file(BOTLOG_CHATID, reqd_sticker_set.documents[0])
-
 
 @luxur.ar_cmd(pattern="سبام (.*)")
 async def tmeme(event):
@@ -297,7 +294,7 @@ async def Hussein(event):
     for chat_username in chat_usernames:
         try:
             chat = await luxur.get_entity(chat_username)
-            await aljoker_nshr(luxur, seconds, chat.id, message, seconds)  # تمرير قيمة seconds هنا لكل مجموعة
+            await aljoker_nshr(luxur, seconds, chat.id, message, seconds)  
         except Exception as e:
             await edit_delete(
                 event, f"⌔∮ لا يمكن العثور على المجموعة أو الدردشة {chat_username}: {str(e)}"

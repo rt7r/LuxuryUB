@@ -1,7 +1,5 @@
-# Copyright (C) 2021-2023 LuxuryUB TEAM
-# FILES WRITTEN BY  @lMl10l
+
 import html
-import base64
 from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl import functions, types
 from telethon.tl.functions.users import GetFullUserRequest
@@ -24,7 +22,7 @@ DEFAULTUSER = str(AUTONAME) if AUTONAME else str(ALIVE_NAME)
 DEFAULTUSERBIO = (
     str(DEFAULT_BIO)
     if DEFAULT_BIO
-    else "الحمد لله دائماً وابداً 🎀 𝑆𝐻 : @ee2en"
+    else "الحمد لله دائماً وابداً  𝑆𝐻 : @ee2en"
 )
 
 @luxur.ar_cmd(pattern="انتحال(?:\s|$)([\s\S]*)")
@@ -109,8 +107,7 @@ async def _(event):
     if BOTLOG:
         await event.client.send_message(
             BOTLOG_CHATID, f"⌁︙تـم اعادة الـحساب الى وضـعه الاصلـي ،✅")
-#Reda
-jeps = ["LuxuryUB"]
+
 @luxur.ar_cmd(pattern="انتحال_الدردشه")
 async def reda(event):
     if event.is_group or event.is_channel:
@@ -118,22 +115,22 @@ async def reda(event):
         msg = event.message.message
         msg = msg.replace(".انتحال_الدردشه", "")
         msg = msg.replace(" ", "")
+        
         if msg == "":
-            return await edit_delete(event, "**قم بوضع يوزر الگروب او القناة بدون علامة @ للانتحال**")
+            return await edit_delete(event, "**✧ ¦ قم بوضع يوزر الگروب او القناة بدون علامة @ للانتحال**")
+        
         chat_id = msg
         try:
-            result = await luxur(GetFullChannelRequest(
-                chat_id
-            ))
+            result = await luxur(GetFullChannelRequest(chat_id))
         except ValueError:
-            return await edit_delete(event, "**᯽︙ لا يوجد هكذا كروب او قناة تاكد من اليوزر او الايدي ويجب ان يكون/تكون عام/عامة وليس خاص/خاصة**")
-        mych = await luxur(GetFullChannelRequest(
-                event.chat_id
-            ))
-        if msg in jeps:
-            return await edit_delete(event, "**᯽︙ لا يمكنك انتحال قناة او كروب السورس !**")
+            return await edit_delete(event, "**✧ ¦ لا يوجد هكذا كروب او قناة تاكد من اليوزر او الايدي ويجب ان يكون/تكون عام/عامة وليس خاص/خاصة**")
+        
+        mych = await luxur(GetFullChannelRequest(event.chat_id))
+        
+
         addgvar(Config.OWNER_ID, f"{event.chat_id}name", mych.chats[0].title)
         addgvar(Config.OWNER_ID, f"{event.chat_id}about", mych.full_chat.about)
+        
         try:
             await luxur(functions.channels.EditTitleRequest(
                 channel=await luxur.get_entity(event.chat_id),
@@ -142,35 +139,35 @@ async def reda(event):
         except ChatAdminRequiredError:
             delgvar (Config.OWNER_ID, f"{event.chat_id}name")
             delgvar (Config.OWNER_ID, f"{event.chat_id}about")
-            return await edit_delete(event, "**᯽︙ يجب ان تكون لديك صلاحيات لتغيير الاسم والصورة والبايو لانتحال قناة او كروب**")
+            return await edit_delete(event, "**✧ ¦ يجب ان تكون لديك صلاحيات لتغيير الاسم والصورة والبايو لانتحال قناة او كروب**")
         except FloodWaitError:
-            return await edit_delete(event, "**انتضر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR خطأ من التيليجرام**")
+            return await edit_delete(event, "**✧ ¦ انتظر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR (خطأ ضغط من التيليجرام)**")
+        
         try:
             await luxur(functions.messages.EditChatAboutRequest(
-            peer=event.chat_id,
-            about=result.full_chat.about
-        ))
+                peer=event.chat_id,
+                about=result.full_chat.about
+            ))
         except FloodWaitError:
-            return await edit_delete(event, "**انتضر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR خطأ من التيليجرام**")
+            return await edit_delete(event, "**✧ ¦ انتظر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR (خطأ ضغط من التيليجرام)**")
+        
         profile_pic = await luxur.download_profile_photo(chat_id, Config.TEMP_DIR)
         pfile = await luxur.upload_file(profile_pic)
+        
         try:
             await luxur(functions.channels.EditPhotoRequest(event.chat_id, pfile))
         except FloodWaitError:
-            return await edit_delete(event, "**انتضر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR خطأ من التيليجرام**")
-        await edit_delete(event, "**᯽︙ تم الانتحال بنجاح ✓**")
-        base64m = 'QGplcHRob24='
-        message = base64.b64decode(base64m)
-        messageo = message.decode()
-        if len(messageo) != 8:
-            return await edit_delete(event, "لا تغير الرسالة @ee2en")
+            return await edit_delete(event, "**✧ ¦ انتظر مدة لا تقل عن 5 دقائق للانتحال مجدداً FLOODWAITERROR (خطأ ضغط من التيليجرام)**")
+        
+        await edit_delete(event, "**✧ ¦ تم الانتحال بنجاح ✓**")
+        
         if BOTLOG:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                f"#الانتحال\nتم إنتحال الدردشه @{msg}\n©{messageo}",
+                f"#الانتحال\nتم إنتحال الدردشه @{msg}\n**© ¦ سورس لوكـجوري**",
             )
     else:
-        await edit_delete(event, "**᯽︙ يمكنك انتحال قناة او كروب في قناة او كروب فقط**")
+        await edit_delete(event, "**✧ ¦ يمكنك انتحال قناة او كروب في قناة او كروب فقط**")
 
 #Reda
 @luxur.ar_cmd(pattern="اعادة_الدردشه")

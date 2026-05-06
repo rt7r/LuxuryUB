@@ -1,7 +1,5 @@
 import random
-
 from LuxuryUB import luxur
-
 from ..core.managers import edit_or_reply
 from . import fonts
 

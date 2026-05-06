@@ -1,6 +1,3 @@
-# Copyright (C) 2021 LuxuryUB TEAM
-# FILES WRITTEN BY  @lMl10l
-
 import asyncio
 from telethon import events
 from LuxuryUB import luxur
@@ -96,7 +93,6 @@ async def _(event):
     for i in animation_ttl:
 
         await asyncio.sleep(animation_interval)
-# Made for Hussein
         await event.edit(animation_chars[i % 11])
 
     await asyncio.sleep(2)

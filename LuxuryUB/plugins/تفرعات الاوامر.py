@@ -1,21 +1,11 @@
-# WRITE  BY @lMl10l
-# PLUGIN FOR لوكـجوريUB
-# @ee2en
-
 import random
 from telethon import events
 import random, re
-
 from LuxuryUB.utils import admin_cmd
-
 import asyncio
 from LuxuryUB import luxur
-
 from ..core.managers import edit_or_reply
-
 plugin_category = "extra"
-
-# اوامر الادمن لسورس لوكـجوري
 
 @luxur.ar_cmd(
     pattern="اوامر الحظر$",
@@ -356,23 +346,7 @@ async def _(event):
         "شرح اوامر الوقت والتاريخ :\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n᯽︙ اختر احدى هذه الاوامر\n\n- ( `.تاريخ` )\nبالرد على الشخص او كتابة معرفه مع الامر لعرض سجل اسماء حسابه.\n\n- ( `.الوقت` )\nلعرض الوقت على شكل ملصق\n\n- ( `.وقت` )\nلعرض الوقت على شكل كتابة\n\n- ( `.مؤقت` + الوقت + النص )\nيقوم بإرسال رسالة مؤقتة و حذفها بعد وقت معين\n- مثـال : `.مؤقت 5 لوكـجوري`\n\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n⌔︙CH : @ee2en"
 )
 
-@luxur.ar_cmd(
-    pattern="اوامر كورونا$",
-    command=("اوامر كورونا", plugin_category),
-)
-async def _(event):
-     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@", "!"):
-        await event.edit(
-        "شرح اوامر كورونا :\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n ᯽︙ اختر احدى هذه الاوامر\n\n- ( `.كورونا` + الدولة )\nللحصول على احصائيات فايروس كورونا\n- مثـال : `.كورونا Morocco`\n\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n⌔︙CH : @ee2en"
-)
-@luxur.ar_cmd(
-    pattern="اوامر الصلاة$",
-    command=("اوامر الصلاة", plugin_category),
-)
-async def _(event):
-     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@", "!"):
-        await event.edit(
-        "شرح اوامر الصلاة :\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n᯽︙ اختر احدى هذه الاوامر\n\n- ( `.صلاة` )\nاكتب الامر مع اسم محافظتك باللغه الانكليزية للحصول على اوقات الصلاة\n\n★•┉ ┉ ┉ ┉ ┉ ┉  ┉ ┉ ┉ ┉•★➖\n⌔︙CH : @ee2en"
+
 )
 @luxur.ar_cmd(
     pattern="اوامر مساعدة$",
@@ -686,7 +660,7 @@ async def _(event):
 )
 async def _(event):
     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@", "!"):
-        help_text = """**᯽︙ قـائمة أوامـر التخصيص (نظام JSON الجديد) 📂**
+        help_text = """**᯽︙ قـائمة أوامـر التخصيص **
 
 ★•┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉ ┉•★
 **1️⃣ | أوامـر النـصوص والكليشات :**

@@ -17,17 +17,15 @@ async def update_cookies(event):
     
     reply = await event.get_reply_message()
     
-    # 2. يتأكد إن الملف المرفق هو ملف نصي وصحيح
     if not reply.document or not reply.file.name.endswith(".txt"):
         return await event.edit("⚠️ الملف غلط! تأكد إنك داز ملف اسمه `cookies.txt`.")
     
     await event.edit("⏳ جاري سحب وتحديث الكوكيز بالسيرفر...")
     
-    # 3. يحمل الملف ويستبدل القديم بالاستضافة (بنفس المسار الرئيسي)
     file_path = "cookies.txt"
     if os.path.exists(file_path):
-        os.remove(file_path) # يمسح القديم
+        os.remove(file_path) 
         
-    await reply.download_media(file=file_path) # يحفظ الجديد
+    await reply.download_media(file=file_path) 
     
     await event.edit("✅ **تم تحديث الكوكيز بنجاح!**\nعاشت ايدك")

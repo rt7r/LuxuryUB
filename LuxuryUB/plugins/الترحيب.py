@@ -1,5 +1,4 @@
-# Copyright (C) 2021 LuxuryUB TEAM
-# FILES WRITTEN BY  @lMl10l
+
 
 from telethon import events
 from telethon.utils import get_display_name

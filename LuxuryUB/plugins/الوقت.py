@@ -88,13 +88,13 @@ async def _(event):
     date_str = now.strftime("%d.%m.%y")
     
     current_time = (
-        "⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡\n"
-        "⚡ LuxuryUB ⚡\n"
-        "⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡\n"
+        "\n"
+        " LuxuryUB \n"
+        "\n"
         f"  {os.path.basename(user_tz_str)}\n"
         f"  Time: {time_str}\n"
         f"  Date: {date_str}\n"
-        "⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡"
+        ""
     )
 
     if not os.path.isdir(Config.TEMP_DIR):

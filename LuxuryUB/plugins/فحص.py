@@ -24,7 +24,6 @@ from ..sql_helper.globals import gvarstatus
 
 plugin_category = "utils"
 
-# تعديل وتطوير: @rt7r_2 | سورس لوكجوري
 file_path = "installation_date.txt"
 if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
     with open(file_path, "r") as file:
@@ -34,7 +33,6 @@ else:
     with open(file_path, "w") as file:
         file.write(installation_time)
 
-# ================= نظام جلب البيانات (JSON + SQL) =================
 def get_db(client_id):
     db_path = f"vars_{client_id}.json"
     if not os.path.exists(db_path): 
@@ -44,7 +42,6 @@ def get_db(client_id):
 
 @luxur.ar_cmd(pattern="فحص(?:\s|$)([\s\S]*)")
 async def amireallyalive(event):
-    # استخدام ايدي المرسل لضمان تعدد المستخدمين
     client_id = event.sender_id
     db = get_db(client_id)
     
@@ -86,7 +83,6 @@ async def amireallyalive(event):
         date=current_date, 
     )
     
-    # تم حذف كود الـ base64 والانضمام الإجباري لضمان خصوصيتك وسرعة البوت
         
     if HuRe_IMG:
         LuxuryUB_list = [x for x in HuRe_IMG.split()]
@@ -104,7 +100,6 @@ async def amireallyalive(event):
     else:
         await edit_or_reply(event, caption)
 
-# الكليشة الأصلية كما طلبتها بالضبط
 temp = """⟣⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⟢
    ⎙ :‌‎𝑶𝒘𝒏𝒆𝒓 ⌯ {mention} 
    ⎙ :‌‎𝒑𝒚𝒕𝒉𝒐𝒏 ⌯  {pyver} 

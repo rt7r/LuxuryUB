@@ -39,7 +39,7 @@ joker_unt8ed = "https://telegra.ph/file/b5d3498a825632e7716e3.jpg"
     groups_only=True,
     require_admin=True,
 )
-async def tmuter(event):  # sourcery no-metrics
+async def tmuter(event):  
     "لكـتم شخص لمدة معينة"
     await event.delete()
     user, reason = await get_user_from_event(event)
@@ -127,7 +127,7 @@ async def tmuter(event):  # sourcery no-metrics
     groups_only=True,
     require_admin=True,
 )
-async def tban(event):  # sourcery no-metrics
+async def tban(event):  
     "لحـظر شخص مع وقـت معيـن"
     catevent = await edit_or_reply(event, "᯽︙ يتـم  الـحظر مؤقـتا أنتـظر **")
     user, reason = await get_user_from_event(event, catevent)
@@ -159,7 +159,6 @@ async def tban(event):  # sourcery no-metrics
         )
     except BadRequestError:
         return await catevent.edit(NO_PERM)
-    # Helps ban group join spammers more easily
     try:
         reply = await event.get_reply_message()
         if reply:
@@ -168,9 +167,7 @@ async def tban(event):  # sourcery no-metrics
         return await catevent.edit(
             "᯽︙ ** لـيس لدي صلاحيـات الحذف لكن سيبقى محظور ❕**"
         )
-    # Delete message and then tell that the command
-    # is done gracefully
-    # Shout out the ID, so that fedadmins can fban later
+
     if reason:
         await catevent.edit(
             f"**المستخدم {_format.mentionuser(user.first_name ,user.id)}** /n **تـم حظره بنـجاح ✅**\n"

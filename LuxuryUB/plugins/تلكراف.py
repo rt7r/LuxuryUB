@@ -1,6 +1,3 @@
-# LuxuryUB
-# - - - - - - - - - - - - -
-
 import os
 import requests
 from datetime import datetime
@@ -31,7 +28,7 @@ def upload_to_cloud(file_path):
         if response.status_code == 200 and isinstance(response.json(), list):
             return "https://telegra.ph" + response.json()[0]['src']
     except Exception:
-        pass # فشل تليجراف، ننتقل للتالي
+        pass 
 
     try:
         with open(file_path, 'rb') as f:
@@ -43,7 +40,7 @@ def upload_to_cloud(file_path):
         if response.status_code == 200 and isinstance(response.json(), list):
             return "https://graph.org" + response.json()[0]['src']
     except Exception:
-        pass # فشل جراف، ننتقل للأقوى
+        pass 
 
     try:
         with open(file_path, 'rb') as f:
@@ -54,7 +51,7 @@ def upload_to_cloud(file_path):
                 timeout=20
             )
         if response.status_code == 200:
-            return response.text.strip() # يرجع رابط مباشر
+            return response.text.strip() 
     except Exception as e:
         LOGS.error(f"All Upload Methods Failed: {e}")
     
@@ -90,7 +87,6 @@ async def _(event):
         if downloaded_file_name.endswith(".webp"):
             resize_image(downloaded_file_name)
         
-        # استخدام الدالة الذكية
         media_url = upload_to_cloud(downloaded_file_name)
         
         if media_url:

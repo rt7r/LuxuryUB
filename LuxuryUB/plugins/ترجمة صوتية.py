@@ -4,17 +4,9 @@ import subprocess
 from LuxuryUB.helpers.functions.functions import translate
 from datetime import datetime
 from alLuxury import get_string
-
-
-
 from gtts import gTTS
-
-
 from LuxuryUB import luxur
-
-
 from ..core.managers import edit_delete, edit_or_reply
-
 from . import deEmojify, reply_id
 
 
@@ -28,11 +20,8 @@ async def reda(event):
     await event.reply(result.stringify())
 
 
-
 @luxur.ar_cmd(pattern="تكلم(?:\s|$)([\s\S]*)")
-
 async def _(event):
-
     if event.fwd_from:
         return
     input_str = event.pattern_match.group(1)
@@ -79,53 +68,29 @@ async def _(event):
              "on",
              required_file_name + ".opus"
         ]
-        
         try:
-
             t_response = subprocess.check_output(
-
                 command_to_execute, stderr=subprocess.STDOUT
-
             )
-
         except (subprocess.CalledProcessError, NameError, FileNotFoundError) as exc:
-
             await HuReevent.edit(str(exc))
-
         else:
-
             os.remove(required_file_name)
-
             required_file_name = required_file_name + ".opus"
-
         end = datetime.now()
-
         ms = (end - start).seconds
-
         await event.client.send_file(
-
             event.chat_id,
-
             required_file_name,
-
             reply_to=event.message.reply_to_msg_id,
-
             allow_cache=False,
-
             voice_note=True,
-
         )
 
         os.remove(required_file_name)
-
         await edit_delete(
-
             HuReevent,
-
             "تحويل النص {} الى مقطع صوتي في {} ثواني ".format(text[0:20], ms),
-
         )
-
     except Exception as e:
-
         await edit_or_reply(HuReevent, f"خطأ:\n{e}")

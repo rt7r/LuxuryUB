@@ -16,7 +16,6 @@ from ..sql_helper.globals import gvarstatus, addgvar
 cookie_path = "cookies.txt"
 has_cookies = os.path.exists(cookie_path)
 
-# نقلل القائمة لأقل عدد ممكن — كل client إضافي = ثواني تأخير عند الفشل
 if has_cookies:
     attack_clients = ["web"]
 else:
@@ -24,11 +23,9 @@ else:
 
 os.environ["PATH"] += os.pathsep + os.path.abspath(".")
 
-# مجلد كاش لـ yt-dlp يسرع الاستخراج بعد أول مرة
 _YTDLP_CACHE = os.path.abspath(".ytdlp_cache")
 os.makedirs(_YTDLP_CACHE, exist_ok=True)
 
-# مجلد للملفات المؤقتة
 _DL_DIR = os.path.abspath(".luxury_downloads")
 os.makedirs(_DL_DIR, exist_ok=True)
 
@@ -57,7 +54,6 @@ YDL_VIDEO_OPTS = {
     "merge_output_format": "mp4",
 }
 
-# نعيد استخدام نفس الـ instance بدل إعادة بنائه في كل طلب
 _ydl_audio = YoutubeDL(YDL_AUDIO_OPTS)
 _ydl_video = YoutubeDL(YDL_VIDEO_OPTS)
 
@@ -65,14 +61,11 @@ active_calls = {}
 is_playing = {}
 playlist = {}
 authorized_users = {}
-# نتتبع الملف المحلي المُشغّل حالياً لكل محادثة، لحذفه بعد انتهاء البث
 current_local_file = {}
 
-# أقفال لمنع تداخل أوامر الميوزك (race conditions)
 _chat_locks = {}
 _owner_locks = {}
 
-# مهلة قصوى لأي عملية pytgcalls — يمنع الجمود الأبدي
 PYTGCALLS_TIMEOUT = 25
 
 
@@ -244,12 +237,10 @@ async def _ensure_call(event):
     """يضمن وجود PyTgCalls instance لصاحب البوت ويسجل الـ stream-end handler."""
     owner_id = (await event.client.get_me()).id
 
-    # قفل لمنع إنشاء أكثر من instance لنفس البوت بشكل متزامن
     async with _owner_lock(owner_id):
         if owner_id in active_calls:
             return active_calls[owner_id], owner_id
 
-        # نتنكر مؤقتاً كـ telethon لتجاوز فحص InvalidMTProtoClient
         with _disguise_as_telethon(event.client):
             call_obj = PyTgCalls(event.client)
 
@@ -258,7 +249,6 @@ async def _ensure_call(event):
         @call_obj.on_update(filters.stream_end())
         async def auto_play_handler(client, update):
             cid = update.chat_id
-            # المقطع السابق خلص — نظف ملفه المحلي إن وجد
             _cleanup_local(cid)
 
             async with _chat_lock(cid):
@@ -299,7 +289,6 @@ async def process_music_command(event, cmd, target_id_str, query, reply):
     chat_id = int(target_id_str) if target_id_str else event.chat_id
     call, owner_id = await _ensure_call(event)
 
-    # نسلسل أوامر نفس المحادثة لمنع تداخلها (سبب الـ freezing)
     async with _chat_lock(chat_id):
         return await _handle_music_cmd(event, cmd, chat_id, query, reply, call)
 
@@ -398,14 +387,12 @@ async def _handle_music_cmd(event, cmd, chat_id, query, reply, call):
         if chat_id in playlist and playlist[chat_id]:
             nxt = playlist[chat_id].pop(0)
             new_local = nxt["url"] if not str(nxt["url"]).startswith("http") else None
-            # نشغل الجديد أولاً (يقتل ffmpeg القديم تلقائياً) قبل ما نحذف الملف القديم
             stream = _build_stream(nxt["url"], nxt["is_video"])
             res = await _safe_call(lambda: call.play(chat_id, stream))
             if isinstance(res, tuple):
                 return await event.reply(
                     f"**⚠️ خطأ في التخطي:** `{res[1] if res[0]=='__error__' else 'انتهت المهلة'}`"
                 )
-            # الآن البث الجديد بدأ، نستبدل التسجيل ونحذف القديم
             old = _swap_local(chat_id, new_local)
             _delete_file(old)
             is_playing[chat_id] = True
@@ -439,7 +426,6 @@ async def _handle_music_cmd(event, cmd, chat_id, query, reply, call):
             if reply and (reply.audio or reply.video or reply.voice):
                 title = _get_file_title(reply)
                 await proc.edit(f"**📥 جاري تحميل:** `{title}`")
-                # نحمل الملف بمجلد ثابت ونحوله لمسار مطلق
                 downloaded = await reply.download_media(file=_DL_DIR + os.sep)
                 url_or_path = os.path.abspath(downloaded)
 
@@ -453,7 +439,6 @@ async def _handle_music_cmd(event, cmd, chat_id, query, reply, call):
                 if not info:
                     return await proc.edit("**❌ لم يتم العثور على نتائج.**")
 
-                # نجرب الحقل المباشر أولاً (الأسرع)، ثم نمر على القوائم
                 url_or_path = info.get("url")
                 if not url_or_path:
                     for f in (info.get("formats") or [])[::-1]:
@@ -476,7 +461,6 @@ async def _handle_music_cmd(event, cmd, chat_id, query, reply, call):
                     playlist[chat_id].clear()
                 is_playing[chat_id] = False
 
-            # إذا في تشغيل حالي ومو إجباري → ضيف للطابور
             if is_playing.get(chat_id) and not is_force:
                 playlist.setdefault(chat_id, []).append(
                     {"title": title, "url": url_or_path, "is_video": is_video}
@@ -487,17 +471,13 @@ async def _handle_music_cmd(event, cmd, chat_id, query, reply, call):
                 )
 
             stream = _build_stream(url_or_path, is_video)
-            # play() في v2.x يتعامل مع الانضمام وتغيير البث تلقائياً.
-            # نشغل الجديد أولاً (يقتل ffmpeg القديم بشكل سليم) قبل ما نحذف الملف القديم.
             res = await _safe_call(lambda: call.play(chat_id, stream))
             if isinstance(res, tuple):
-                # فشل البث: نظف الملف الجديد لأنه ما اشتغل
                 if is_local:
                     _delete_file(url_or_path)
                 err_msg = res[1] if res[0] == "__error__" else "انتهت المهلة (jam)"
                 return await proc.edit(f"**⚠️ فشل البث المباشر:** `{err_msg}`")
 
-            # البث الجديد بدأ — استبدل التسجيل واحذف القديم بأمان
             old = _swap_local(chat_id, url_or_path if is_local else None)
             _delete_file(old)
             is_playing[chat_id] = True

@@ -4,7 +4,6 @@ import os
 import datetime
 from telethon import events
 from LuxuryUB import *
-#ها يالفاشل شعدك داخل هنا 🫣 اعتمد ع نفسك لتخلي سورس الخفاش مصدر طشت سورسك
 thebatman_Asbo3 = {
     'Monday': 'الاثنين',
     'Tuesday': 'الثلاثاء',
@@ -68,11 +67,11 @@ async def Hussein(event, caption):
 async def Reda(event):
     if gvarstatus(Config.OWNER_ID, "savepicforme"):
         caption = """**
-           🕷  غير مبري الذمة اذا استعملته للأبتزاز  🕷
-🕷 تم حفظ الذاتية بنجاح ✓
-🕷 أسم المرسل : [{0}](tg://user?id={1})
-🕷  تاريخ الذاتية : `{2}`
-🕷  أرسلت في يوم `{3}`
-       🕷    theb    🕷
+           ◊  غير مبري الذمة اذا استعملته للأبتزاز  ◊
+◊ تم حفظ الذاتية بنجاح ✓
+◊ أسم المرسل : [{0}](tg://user?id={1})
+◊  تاريخ الذاتية : `{2}`
+◊  أرسلت في يوم `{3}`
+       ◊   Luxury   ◊
         **"""
         await Hussein(event, caption)

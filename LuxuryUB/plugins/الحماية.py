@@ -63,11 +63,9 @@ async def do_pm_permit_action(event, chat):
         current_time = time.time()
         last_reply = RECENT_REPLIES.get(str(chat.id), 0)
         
-        # إذا لم تمر 10 دقائق (600 ثانية)، تجاهل ولا ترد
-        if current_time - last_reply < 600:
+        if current_time - last_reply < 300:
             return
             
-        # تحديث وقت آخر رد لهذا الشخص
         RECENT_REPLIES[str(chat.id)] = current_time
         
         custompmpermit = db.get("pmpermit_txt")
@@ -206,7 +204,7 @@ async def pmpermit_on(event):
         db["pmpermit"] = "true"
         db["pmpermit_mode"] = "reply_only"
         save_db(client_id, db)
-        await edit_delete(event, "**- تم تفعيل الرد التلقائي الذكي (فاصل 10 دقائق) 🌿✅**")
+        await edit_delete(event, "**- تم تفعيل الرد التلقائي الذكي ✅**")
         
     elif input_str == "تعطيل":
         if "pmpermit" in db:

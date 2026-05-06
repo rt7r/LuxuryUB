@@ -1,6 +1,4 @@
-import base64
 import time
-
 from telethon.tl.custom import Dialog
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from telethon.tl.types import Channel, Chat, User
@@ -160,10 +158,10 @@ async def ViewChJok(event):
     catcmd = event.pattern_match.group(1)
     catevent = await edit_or_reply(event, STAT_INDICATION)
     start_time = time.time()
-    cat = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
     hi = []
     hica = []
     hico = []
+    
     async for dialog in event.client.iter_dialogs():
         entity = dialog.entity
         if isinstance(entity, Channel) and entity.broadcast:
@@ -171,11 +169,13 @@ async def ViewChJok(event):
             channel_id = entity.id
             is_owner = entity.creator
             is_admin = entity.admin_rights
+            
             if entity.username:
-                if entity.megagroup:  # قناة عامة
+                if entity.megagroup: 
                     channel_link = f"{channel_name} ({entity.username})"
-                else:  # قناة خاصة
+                else: 
                     channel_link = f"[{channel_name}](https://t.me/{entity.username})"
+                    
                 if is_owner:
                     hico.append(channel_link)
                 if is_admin:
@@ -183,16 +183,18 @@ async def ViewChJok(event):
                 if not is_owner and not is_admin:
                     hi.append(channel_link)
             else:
-                if entity.megagroup:  # قناة عامة
+                if entity.megagroup:  
                     channel_link = f"{channel_name}"
-                else:  # قناة خاصة
+                else:  
                     channel_link = f"[{channel_name}](https://t.me/c/{channel_id}/1)"
+                    
                 if is_owner:
                     hico.append(channel_link)
                 if is_admin:
                     hica.append(channel_link)
                 if not is_owner and not is_admin:
                     hi.append(channel_link)
+                    
     if catcmd == "جميع القنوات":
         output = CHANNELS_STR
         for k, channel in enumerate(hi, start=1):
@@ -205,27 +207,24 @@ async def ViewChJok(event):
         output = CHANNELS_OWNERSTR
         for k, channel in enumerate(hico, start=1):
             output += f"{k}• {channel}\n"
+            
     stop_time = time.time() - start_time
-    try:
-        cat = Get(cat)
-        await event.client(cat)
-    except BaseException:
-        pass
-    output += f"\n\n**استغرق حساب القنوات: **{stop_time:.02f} ثانية"
+    output += f"\n\n**💎 ¦ استغرق حساب القنوات: **{stop_time:.02f} ثانية"
+    
     try:
         await catevent.edit(output)
     except Exception:
         await edit_or_reply(catevent, output)
         
 @luxur.on(admin_cmd(pattern="قائمه (جميع المجموعات|مجموعات اديرها|كروباتي)$"))
-async def stats(event):  # sourcery no-metrics
+async def stats(event):
     catcmd = event.pattern_match.group(1)
     catevent = await edit_or_reply(event, STAT_INDICATION)
     start_time = time.time()
-    cat = base64.b64decode("YnkybDJvRG04WEpsT1RBeQ==")
     hi = []
     higa = []
     higo = []
+    
     async for dialog in event.client.iter_dialogs():
         entity = dialog.entity
         if isinstance(entity, Channel) and entity.broadcast:
@@ -242,6 +241,7 @@ async def stats(event):  # sourcery no-metrics
                 higa.append([entity.title, entity.id])
             if entity.creator:
                 higo.append([entity.title, entity.id])
+                
     if catcmd == "جميع المجموعات":
         output = GROUPS_STR
         for k, i in enumerate(hi, start=1):
@@ -257,13 +257,10 @@ async def stats(event):  # sourcery no-metrics
         for k, i in enumerate(higo, start=1):
             output += f"{k} .) [{i[0]}](https://t.me/c/{i[1]}/1)\n"
         caption = GROUPS_OWNERSTR
+        
     stop_time = time.time() - start_time
-    try:
-        cat = Get(cat)
-        await event.client(cat)
-    except BaseException:
-        pass
-    output += f"\n**استغرق حساب المجموعات : ** {stop_time:.02f} ثانيه"
+    output += f"\n**💎 ¦ استغرق حساب المجموعات : ** {stop_time:.02f} ثانيه"
+    
     try:
         await catevent.edit(output)
     except Exception:

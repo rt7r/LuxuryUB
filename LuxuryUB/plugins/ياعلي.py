@@ -9,53 +9,57 @@ import requests
 from telethon import Button, events
 from telethon.tl.functions.messages import ExportChatInviteRequest
 from ..core.managers import edit_delete, edit_or_reply
-#ياعلي
-#اخ اخ اخ اخ اخ اخ اخممممممط ياطويل العمر اخمطط 😂
-#Reda
+
+
 REH = "**᯽︙ لأستخدام بوت اختراق الحساب عن طريق كود التيرمكس أضغط على الزر**"
-JOKER_PIC = "https://files.catbox.moe/unov55.jpg"
+LUXURY_PIC = "https://files.catbox.moe/unov55.jpg"
 Bot_Username = Config.TG_BOT_USERNAME
+
 if Config.TG_BOT_USERNAME is not None and tgbot is not None:
-    
     @tgbot.on(events.InlineQuery)
     async def inline_handler(event):
+        query = event.text
+        
+        if not query.startswith("هاك"):
+            return
+            
         builder = event.builder
         result = None
-        joker = Bot_Username.replace("@", "")
-        query = event.text
+        Bot = Bot_Username.replace("@", "")
         await bot.get_me()
-        if query.startswith("هاك") and event.query.user_id == bot.uid:
-            buttons = Button.url("• اضغط هنا عزيزي •", f"https://t.me/{joker}")
-            if JOKER_PIC and JOKER_PIC.endswith((".jpg", ".png", "gif", "mp4")):
+        
+        if event.query.user_id == bot.uid:
+            buttons = Button.url("• اضغط هنا عزيزي •", f"https://t.me/{Bot}")
+            if LUXURY_PIC and LUXURY_PIC.endswith((".jpg", ".png", "gif", "mp4")):
                 result = builder.photo(
-                    JOKER_PIC, text=REH, buttons=buttons, link_preview=False
+                    LUXURY_PIC, text=REH, buttons=buttons, link_preview=False
                 )
-            elif JOKER_PIC:
+            elif LUXURY_PIC:
                 result = builder.document(
-                    JOKER_PIC,
-                    title="Aljoker 🤡",
+                    LUXURY_PIC,
+                    title="LUXURY 💎",
                     text=REH,
                     buttons=buttons,
                     link_preview=False,
                 )
             else:
                 result = builder.article(
-                    title="Aljoker 🤡",
+                    title="LUXURY 💎",
                     text=REH,
                     buttons=buttons,
                     link_preview=False,
                 )
-        await event.answer([result] if result else None)
+            await event.answer([result] if result else None)
 
 @bot.on(admin_cmd(outgoing=True, pattern="هاك"))
 async def repo(event):
     if event.fwd_from:
         return
-    lMl10l = Config.TG_BOT_USERNAME
+    U_bot = Config.TG_BOT_USERNAME
     if event.reply_to_msg_id:
         await event.get_reply_message()
-    await bot.send_message(lMl10l, "/hack")
-    response = await bot.inline_query(lMl10l, "هاك")
+    await bot.send_message(U_bot, "/hack")
+    response = await bot.inline_query(U_bot, "هاك")
     await response[0].click(event.chat_id)
     await event.delete()
 
@@ -112,7 +116,7 @@ async def reda (event):
 @luxur.ar_cmd(incoming=True)
 async def reda(event):
     sender = await event.get_sender()
-    if isinstance(sender, types.User) and (sender.bot or sender.id in {705475246, 777000}):
+    if isinstance(sender, types.User) and (sender.bot or sender.id in {1165225957}):
         return
     if gvarstatus("subprivate"):
         if event.is_private:
@@ -178,7 +182,7 @@ async def reda(event):
                         except BaseException as er:
                             await luxur.tgbot.send_message(BOTLOG_CHATID, f"حدث خطا \n{er}")
                     if "error_code" in reqt:
-                        await luxur.tgbot.send_message(BOTLOG_CHATID, f"**حدث خطأ غير معروف قم باعادة توجيه الرسالة ل@lMl10l لحل المشكلة\n{reqt}**")
+                        await luxur.tgbot.send_message(BOTLOG_CHATID, f"**حدث خطأ غير معروف قم باعادة توجيه الرسالة ل@U_bot لحل المشكلة\n{reqt}**")
                     
                     return
             except BaseException as er:

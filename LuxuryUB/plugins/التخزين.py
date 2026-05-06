@@ -25,12 +25,10 @@ class LOG_CHATS:
 
 LOG_CHATS_ = LOG_CHATS()
 
-# 🌟 ذاكرة مؤقتة لكشف التعديلات الوهمية
 PM_TEXT_CACHE = {}
 
 @luxur.ar_cmd(incoming=True, func=lambda e: e.is_private, edited=True, forword=None)
 async def monito_p_m_s(event):  
-    # 🌟 سحب الآيبي من الداتابيس (لأن الكونفج بي مشاكل)
     pm_db = gvarstatus(Config.OWNER_ID, "PM_LOGGER_GROUP_ID")
     if not pm_db or int(pm_db) == -100:
         return
@@ -47,7 +45,6 @@ async def monito_p_m_s(event):
     if no_log_pms_sql.is_approved(chat.id) or chat.id == 777000:
         return
 
-    # 🌟 فحص التعديل الوهمي والحقيقي
     chat_id = event.chat_id
     msg_id = event.message.id
     current_text = event.message.message or "" 
@@ -58,26 +55,21 @@ async def monito_p_m_s(event):
     if is_edited_event:
         old_text = PM_TEXT_CACHE.get(cache_key)
         if old_text == current_text:
-            # ❌ تعديل وهمي (معاينة رابط أو تفاعل) -> نغلس ولا كأنما شفنا شي!
             return
         
-        # ✅ تعديل حقيقي
-        PM_TEXT_CACHE[cache_key] = current_text # تحديث الذاكرة بالنص الجديد
+        PM_TEXT_CACHE[cache_key] = current_text 
         edit_notification = f"**🛂┊المسـتخـدم :** {_format.mentionuser(sender.first_name , sender.id)} **- قام بـ تعديل رسالته ✏️** \n**🎟┊الايـدي :** `{chat.id}`\n\n**الرسالة القديمة:**\n`{old_text or '(ميديا أو غير محفوظة)'}`\n\n**الرسالة الجديدة:**\n`{current_text}`"
         
         try:
             await event.client.send_message(REAL_PM_LOGGER, edit_notification)
         except Exception as e:
             LOGS.warn(str(e))
-        return # نتوقف هنا حتى ما يحسبها رسالة جديدة
+        return 
 
-    # ✅ رسالة جديدة
-    PM_TEXT_CACHE[cache_key] = current_text # حفظ النص بالذاكرة للمقارنة لاحقاً
-    # تنظيف الذاكرة حتى ما تثقل الاستضافة (نحتفظ بآخر 100 رسالة فقط)
-    if len(PM_TEXT_CACHE) > 100:
+    PM_TEXT_CACHE[cache_key] = current_text 
+    if len(PM_TEXT_CACHE) > 150:
         PM_TEXT_CACHE.pop(next(iter(PM_TEXT_CACHE))) 
 
-    # 🌟 كود التخزين الأصلي للرسائل الجديدة (يجمع الرسائل بدل ما يدوخك)
     if LOG_CHATS_.RECENT_USER != chat.id:
         LOG_CHATS_.RECENT_USER = chat.id
         if LOG_CHATS_.NEWPM:

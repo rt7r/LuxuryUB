@@ -1,6 +1,4 @@
-#========================#
-#       LuxuryUB  - lMl10l  #  
-# =======================#
+
 
 from asyncio import sleep
 from telethon.utils import get_display_name
