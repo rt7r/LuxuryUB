@@ -160,7 +160,7 @@ async def twt(event):
             text = (await event.get_reply_message()).message
         else:
             return await edit_delete(
-                event, "**᯽︙ ماذا يفترض بي ان اغرد اكتي نصا**"
+                event, "**᯽︙ ماذا يفترض بي ان اغرد اكتب نصا**"
             )
     text = deEmojify(text)
     await event.delete()

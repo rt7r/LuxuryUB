@@ -71,6 +71,7 @@ if __name__ == "__main__":
         print("\n--- 🔐 إعدادات البوت (لمرة واحدة فقط) ---")
         session = input("👤 أدخل كود الجلسة (STRING_SESSION): ")
         bot_token = input("🤖 أدخل توكن البوت (TG_BOT_TOKEN): ")
+        busername = input("ادخل يوزر البوت (BOT_USERNAME)")
         owner_id = input("🆔 أدخل الآيدي مالتك (OWNER_ID): ")
 
         config_content = f"""from sample_config import Config
@@ -82,6 +83,7 @@ class Development(Config):
     DB_URI = "sqlite:///luxury.db"
     STRING_SESSION = "{session}"
     TG_BOT_TOKEN = "{bot_token}"
+    BOT_USERNAME = "{busername}"
     COMMAND_HAND_LER = "."
     SUDO_COMMAND_HAND_LER = "."
     OWNER_ID = {owner_id}
