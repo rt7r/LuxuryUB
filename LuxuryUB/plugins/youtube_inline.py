@@ -122,7 +122,7 @@ async def bot_inline_handler(event):
     user_id = event.sender_id
     
     # 1. جلب النتائج من المحرك الصاروخي
-    results = yt_fast_search(query)
+    results = await yt_fast_search(query)
     if not results: return
     
     # 2. تخزينها في الرام للتقليب السريع
@@ -187,6 +187,8 @@ async def bot_callback_handler(event):
         dl_type = "a" if action == "dla" else "v"
         type_str = "الصوت 🎵" if dl_type == "a" else "الفيديو 🎬"
         
+        current_page = next((i for i, v in enumerate(results) if v['id'] == video_id), 0) + 1
+        
         await event.answer(f"⏳ جاري معالجة {type_str}...", alert=False)
         await event.edit(buttons=[[Button.inline("⏳ جاري التحميل من يوتيوب...", data="yt_ignore")]])
         
@@ -207,7 +209,7 @@ async def bot_callback_handler(event):
             if file_size_mb < 50:
                 await event.client.send_file(target_chat, file_path, caption=caption)
             else:
-                await luxur_client.send_file(target_chat, file_path, caption=caption)
+                await luxur.send_file(target_chat, file_path, caption=caption)
             
             await event.edit(buttons=get_pagination_buttons(video_id, current_page, total_pages))
             
@@ -221,7 +223,7 @@ async def bot_callback_handler(event):
 
 
 
-@luxur.ar_cmd(events.NewMessage(outgoing=True, pattern=r'^\.بحث (.*)'))
+@luxur.ar_cmd(pattern=r"بحث (.*)")
 async def wrap_user_search(event):
     await user_search_handler(event)
 
