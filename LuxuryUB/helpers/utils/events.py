@@ -1,4 +1,3 @@
-from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from telethon.tl.types import MessageEntityMentionName
 
 from ...Config import Config
@@ -7,7 +6,6 @@ from ...core.managers import edit_delete
 
 LOGS = logging.getLogger(__name__)
 
-
 async def reply_id(event):
     reply_to_id = None
     if event.sender_id in Config.SUDO_USERS:
@@ -15,7 +13,6 @@ async def reply_id(event):
     if event.reply_to_msg_id:
         reply_to_id = event.reply_to_msg_id
     return reply_to_id
-
 
 async def get_user_from_event(
     event, catevent=None, secondgroup=None, nogroup=False, noedits=False
@@ -59,21 +56,21 @@ async def get_user_from_event(
             previous_message = await event.get_reply_message()
             if previous_message.from_id is None:
                 if not noedits:
-                    await edit_delete(catevent, "`Well that's an anonymous admin !`")
+                    await edit_delete(catevent, "**✧ ¦ عذراً، هذا مشرف مخفي لا يمكنني استخراج بياناته!**")
                 return None, None
             user_obj = await event.client.get_entity(previous_message.sender_id)
             return user_obj, extra
         elif not args:
             if not noedits:
                 await edit_delete(
-                    catevent, "⌯︙يجب وضـع ايدي او معرف او بالـرد على الشخص "
+                    catevent, "**✧ ¦ يجب وضـع ايدي او معرف او بالـرد على الشخص**"
                 )
             return None, None
     except Exception as e:
         LOGS.error(str(e))
     if not noedits:
-        await edit_delete(catevent, "⌯︙ يجـب الـرد علـى رسالة اولا")
+        await edit_delete(catevent, "**✧ ¦ يجـب الـرد علـى رسالة أولاً**")
     return None, None
 
-
-
+async def checking(luxur):
+    pass

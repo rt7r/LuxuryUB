@@ -347,7 +347,6 @@ async def _(event):
 )
 
 
-)
 @luxur.ar_cmd(
     pattern="اوامر مساعدة$",
     command=("اوامر مساعدة", plugin_category),

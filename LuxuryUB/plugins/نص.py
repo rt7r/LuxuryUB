@@ -6,6 +6,8 @@ from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.functions.account import UpdateNotifySettingsRequest
 from LuxuryUB.utils import admin_cmd
+from LuxuryUB import luxur
+
 
 @luxur.on(admin_cmd(pattern="تحويل نص ?(.*)"))
 async def _(event):

@@ -6,7 +6,7 @@ from telethon.tl.functions.channels import EditAdminRequest
 from telethon.tl.types import ChatAdminRights
 
 from LuxuryUB.Config import Config
-from LuxuryUB.core.managers import gvarstatus, addgvar
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
 from LuxuryUB import luxur
 
 from .yt_engine import yt_fast_search, yt_secure_download 
