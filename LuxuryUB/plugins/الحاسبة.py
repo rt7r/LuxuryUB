@@ -4,8 +4,9 @@ from telethon import Button
 from telethon.events import CallbackQuery, InlineQuery
 
 from LuxuryUB import CMD_HELP, luxur
-
+from ..Config import Config
 from ..core.decorators import check_owner
+from LuxuryUB.utils import admin_cmd
 
 CALC = {}
 plugin_category = "utils"
@@ -36,17 +37,16 @@ tultd = [Button.inline(f"{x}", data=f"calc{x}") for x in m]
 lst = list(zip(tultd[::4], tultd[1::4], tultd[2::4], tultd[3::4]))
 lst.append([Button.inline("=", data="calc=")])
 
-
 @luxur.on(admin_cmd(pattern="حاسبة(?:\s|$)([\s\S]*)"))
 async def icalc(e):
-    if e.client._bot:
+    # تم تصحيح الخطأ هنا للتوافق مع نسخ Telethon الحديثة
+    if await e.client.is_bot():
         return await e.reply(
-            "**الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst
+            "**✧ ¦ الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst
         )
     results = await e.client.inline_query(Config.TG_BOT_USERNAME, "calc")
     await results[0].click(e.chat_id, silent=True, hide_via=True)
     await e.delete()
-
 
 @luxur.tgbot.on(InlineQuery)
 async def inlinecalc(event):
@@ -56,12 +56,10 @@ async def inlinecalc(event):
     if (
         query_user_id == Config.OWNER_ID or query_user_id in Config.SUDO_USERS
     ) and string == "calc":
-        event.builder
         calc = event.builder.article(
-            "Calc", text="**الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst
+            "Calc", text="**✧ ¦ الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst
         )
         await event.answer([calc])
-
 
 @luxur.tgbot.on(CallbackQuery(data=re.compile(b"calc(.*)")))
 @check_owner
@@ -73,7 +71,7 @@ async def _(e):  # sourcery no-metrics
         if CALC.get(user):
             CALC.pop(user)
         await e.edit(
-            "**الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**",
+            "**✧ ¦ الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**",
             buttons=[Button.inline("افتح مره اخرى", data="recalc")],
         )
     elif x == "C":
@@ -113,7 +111,7 @@ async def _(e):  # sourcery no-metrics
             out = eval(get)
             try:
                 num = float(out)
-                await e.answer(f"▾∮ الجـواب : {num}", cache_time=0, alert=True)
+                await e.answer(f"✧ ¦ الجـواب : {num}", cache_time=0, alert=True)
             except BaseException:
                 CALC.pop(user)
                 await e.answer("خـطأ", cache_time=0, alert=True)
@@ -126,7 +124,6 @@ async def _(e):  # sourcery no-metrics
             return await e.answer(str(get + x))
         CALC.update({user: x})
         await e.answer(str(x))
-
 
 @luxur.tgbot.on(CallbackQuery(data=re.compile(b"recalc")))
 @check_owner
@@ -156,8 +153,8 @@ async def _(e):
     tultd = [Button.inline(f"{x}", data=f"calc{x}") for x in m]
     lst = list(zip(tultd[::4], tultd[1::4], tultd[2::4], tultd[3::4]))
     lst.append([Button.inline("=", data="calc=")])
-    await e.edit("**الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst)
+    await e.edit("**✧ ¦ الحـاسبة العـلمية لسـورس لوكـجوري\n @ee2en**", buttons=lst)
 
 CMD_HELP.update(
-    {"الحسابة": ".حاسبة" "\n فقط اكتب الامر لعرض حاسبة علميه تحتاج الى تفعيل وضع الانلاين اولا\n\n"}
+    {"الحاسبة": ".حاسبة\n لعرض حاسبة علمية (تحتاج إلى تفعيل وضع الانلاين أولاً)\n\n"}
 )
