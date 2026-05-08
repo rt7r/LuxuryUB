@@ -23,7 +23,6 @@ def save_db(client_id, db):
     db_path = f"vars_{client_id}.json"
     with open(db_path, "w", encoding="utf-8") as f: 
         json.dump(db, f, indent=4)
-# =======================================================
 
 # --- دالة الرفع الشاملة (بديل تليجراف الفاشل) ---
 def upload_to_cloud(file_path):
