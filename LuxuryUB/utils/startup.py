@@ -103,7 +103,7 @@ async def startupmessage():
             Config.CATUBLOGO = await luxur.tgbot.send_file(
                 BOTLOG_CHATID,
                 "https://k.top4top.io/p_3757trgqt1.jpg",
-                caption="**‏᯽︙ بــوت لـوكجـوري يـعـمـل بـنـجـاح ✓ \n᯽︙ أرسل `.الاوامر` لرؤية اوامر السورس \n  ᯽︙ المطور : @rt7r_2**",
+                caption="**‏᯽︙ بــوت لـوكجـوري يـعـمـل بـنـجـاح ✓ \n᯽︙ أرسل `.الاوامر` لرؤية اوامر السورس \n᯽︙ القناة : @ee2en**",
                 buttons=[(Button.url("سورس لوكجوري", "https://t.me/ee2en"),)],
             )
     except Exception as e:

@@ -139,7 +139,7 @@ def _caption(video: dict, page: int, total: int) -> str:
     return out
 
 
-def _dl_caption(emoji: str, bot_usr: str) -> str:
+def _dl_caption(emoji: str, title: str, bot_usr: str) -> str:
 
     return (
         f"<blockquote>Download Done {emoji}</blockquote>\n"
